@@ -20,9 +20,13 @@ class ReminderResource extends Resource
 {
     protected static ?string $model = Reminder::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBellAlert;
 
     protected static ?string $recordTitleAttribute = 'Reminder.php';
+
+    protected static ?string $navigationLabel = 'Recordatorio';
+    protected static ?string $modelLabel = 'Recordatorio';
+    protected static ?string $pluralModelLabel = 'Recordatorios';
 
     public static function form(Schema $schema): Schema
     {

@@ -20,9 +20,13 @@ class BreedResource extends Resource
 {
     protected static ?string $model = Breed::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
     protected static ?string $recordTitleAttribute = 'Breed';
+
+    protected static ?string $navigationLabel = 'Raza';
+    protected static ?string $modelLabel = 'Raza';
+    protected static ?string $pluralModelLabel = 'Razas';
 
     public static function form(Schema $schema): Schema
     {

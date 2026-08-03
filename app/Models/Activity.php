@@ -18,6 +18,9 @@ class Activity extends Model
         'description',
         'pet_id',
     ];
+    protected $casts = [
+    'date_time' => 'datetime',
+];
 
     // 🔗 Relación: pertenece a una mascota
     public function pet()

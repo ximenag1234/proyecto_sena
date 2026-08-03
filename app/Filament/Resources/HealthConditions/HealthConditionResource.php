@@ -20,9 +20,13 @@ class HealthConditionResource extends Resource
 {
     protected static ?string $model = HealthCondition::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
 
     protected static ?string $recordTitleAttribute = 'Healthcondition.php';
+
+    protected static ?string $navigationLabel = 'Condición de salud';
+    protected static ?string $modelLabel = 'Condición de salud';
+    protected static ?string $pluralModelLabel = 'Condiciones de salud';
 
     public static function form(Schema $schema): Schema
     {

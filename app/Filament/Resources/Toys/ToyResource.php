@@ -20,9 +20,13 @@ class ToyResource extends Resource
 {
     protected static ?string $model = Toy::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
 
     protected static ?string $recordTitleAttribute = 'Toy.php';
+
+    protected static ?string $navigationLabel = 'Juguete';
+    protected static ?string $modelLabel = 'Juguete';
+    protected static ?string $pluralModelLabel = 'Juguetes';
 
     public static function form(Schema $schema): Schema
     {

@@ -15,17 +15,22 @@ class MedicationsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
+    TextColumn::make('name')
+        ->label('Nombre')
+        ->searchable(),
+
+    TextColumn::make('created_at')
+        ->label('Fecha de creación')
+        ->dateTime('d/m/Y H:i')
+        ->sortable()
+        ->toggleable(isToggledHiddenByDefault: true),
+
+    TextColumn::make('updated_at')
+        ->label('Última actualización')
+        ->dateTime('d/m/Y H:i')
+        ->sortable()
+        ->toggleable(isToggledHiddenByDefault: true),
+])
             ->filters([
                 //
             ])

@@ -19,10 +19,13 @@ use Filament\Tables\Table;
 class BathRoutineResource extends Resource
 {
     protected static ?string $model = BathRoutine::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedStar;
     protected static ?string $recordTitleAttribute = 'Bathroutine';
+    protected static ?string $navigationLabel = 'Rutina de Baño';
+    protected static ?string $modelLabel = 'Rutina de Baño';
+    protected static ?string $pluralModelLabel = 'Rutinas de Baño';
+
+
 
     public static function form(Schema $schema): Schema
     {

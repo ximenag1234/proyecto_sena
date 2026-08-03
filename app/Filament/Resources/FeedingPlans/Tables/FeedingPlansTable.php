@@ -15,36 +15,55 @@ class FeedingPlansTable
     {
         return $table
             ->columns([
-                TextColumn::make('food_type')
-                    ->searchable(),
-                TextColumn::make('amount')
-                    ->searchable(),
-                TextColumn::make('frequency')
-                    ->searchable(),
-                TextColumn::make('age_min')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('age_max')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('weight_min')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('weight_max')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('breed_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
+    TextColumn::make('food_type')
+        ->label('Tipo de alimento')
+        ->searchable(),
+
+    TextColumn::make('amount')
+        ->label('Cantidad')
+        ->searchable(),
+
+    TextColumn::make('frequency')
+        ->label('Frecuencia')
+        ->searchable(),
+
+    TextColumn::make('age_min')
+        ->label('Edad mínima')
+        ->numeric()
+        ->sortable(),
+
+    TextColumn::make('age_max')
+        ->label('Edad máxima')
+        ->numeric()
+        ->sortable(),
+
+    TextColumn::make('weight_min')
+        ->label('Peso mínimo')
+        ->numeric()
+        ->sortable(),
+
+    TextColumn::make('weight_max')
+        ->label('Peso máximo')
+        ->numeric()
+        ->sortable(),
+
+    TextColumn::make('breed.name')
+        ->label('Raza')
+        ->searchable()
+        ->sortable(),
+
+    TextColumn::make('created_at')
+        ->label('Fecha de creación')
+        ->dateTime('d/m/Y H:i')
+        ->sortable()
+        ->toggleable(isToggledHiddenByDefault: true),
+
+    TextColumn::make('updated_at')
+        ->label('Última actualización')
+        ->dateTime('d/m/Y H:i')
+        ->sortable()
+        ->toggleable(isToggledHiddenByDefault: true),
+])
             ->filters([
                 //
             ])

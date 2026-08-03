@@ -2,16 +2,29 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Medication;
 use Illuminate\Database\Seeder;
 
 class MedicationSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        // Lista de medicamentos
+        foreach ([
+            'Amoxicilina',
+            'Carprofeno',
+            'Meloxicam',
+            'Prednisolona'
+        ] as $medicamento) {
+
+            Medication::updateOrCreate(
+                [
+                    'name' => $medicamento
+                ],
+                [
+                    'description' => $medicamento
+                ]
+            );
+        }
     }
 }

@@ -20,9 +20,13 @@ class MedicationResource extends Resource
 {
     protected static ?string $model = Medication::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
     protected static ?string $recordTitleAttribute = 'Medication.php';
+
+    protected static ?string $navigationLabel = 'Medicamento';
+    protected static ?string $modelLabel = 'Medicamento';
+    protected static ?string $pluralModelLabel = 'Medicamentos';
 
     public static function form(Schema $schema): Schema
     {

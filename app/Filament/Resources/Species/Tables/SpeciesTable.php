@@ -1,37 +1,22 @@
 <?php
 
-namespace App\Filament\Resources\Reminders\Tables;
+namespace App\Filament\Resources\Species\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class RemindersTable
+class SpeciesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-    TextColumn::make('type')
-        ->label('Tipo')
+    TextColumn::make('name')
+        ->label('Nombre')
         ->searchable(),
-
-    TextColumn::make('date_time')
-        ->label('Fecha y hora')
-        ->dateTime('d/m/Y H:i')
-        ->sortable(),
-
-    TextColumn::make('status')
-        ->label('Estado')
-        ->searchable(),
-
-    TextColumn::make('pet.name')
-        ->label('Mascota')
-        ->searchable()
-        ->sortable(),
 
     TextColumn::make('created_at')
         ->label('Fecha de creación')
@@ -49,7 +34,6 @@ class RemindersTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

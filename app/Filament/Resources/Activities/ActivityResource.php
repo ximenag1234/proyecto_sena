@@ -20,9 +20,15 @@ class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBolt;
 
     protected static ?string $recordTitleAttribute = 'activity.php';
+
+    protected static ?string $navigationLabel = 'Actividad';
+
+    protected static ?string $modelLabel = 'Actividad';
+
+    protected static ?string $pluralModelLabel = 'Actividades';
 
     public static function form(Schema $schema): Schema
     {

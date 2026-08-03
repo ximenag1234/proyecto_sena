@@ -20,9 +20,13 @@ class FeedingPlanResource extends Resource
 {
     protected static ?string $model = FeedingPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCake;
 
     protected static ?string $recordTitleAttribute = 'FeedingPlan.php';
+
+    protected static ?string $navigationLabel = 'Plan de alimentación';
+    protected static ?string $modelLabel = 'Plan de alimentación';
+    protected static ?string $pluralModelLabel = 'Planes de alimentación';
 
     public static function form(Schema $schema): Schema
     {

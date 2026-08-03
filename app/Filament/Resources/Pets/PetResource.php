@@ -18,11 +18,17 @@ use Filament\Tables\Table;
 
 class PetResource extends Resource
 {
+    
+    
     protected static ?string $model = Pet::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFaceSmile;
 
     protected static ?string $recordTitleAttribute = 'Pet.php';
+
+    protected static ?string $navigationLabel = 'Mascota';
+    protected static ?string $modelLabel = 'Mascota';
+    protected static ?string $pluralModelLabel = 'Mascotas';
 
     public static function form(Schema $schema): Schema
     {

@@ -9,7 +9,7 @@ class PetSeeder extends Seeder
 {
     public function run(): void
     {
-        $pets = [
+        $mascotas = [
             [
                 'name' => 'Max',
                 'species' => 'Perro',
@@ -47,7 +47,7 @@ class PetSeeder extends Seeder
                 'species' => 'Perro',
                 'birth_date' => '2018-09-12',
                 'weight' => 18.7,
-                'user_id' => 3,
+                'user_id' => 5,
                 'breed_id' => 5,
             ],
             [
@@ -92,8 +92,9 @@ class PetSeeder extends Seeder
             ],
         ];
 
-        foreach ($pets as $pet) {
-            Pet::create($pet);
+        // Registrar cada mascota en la base de datos
+        foreach ($mascotas as $mascota) {
+            Pet::create($mascota);
         }
     }
 }
