@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\BathRoutines\Schemas;
 
+use App\Models\Breed;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -14,16 +16,21 @@ class BathRoutineForm
                 TextInput::make('frequency')
                     ->label('Frecuencia')
                     ->required(),
+
                 TextInput::make('age_min')
                     ->label('Edad_minima')
                     ->numeric(),
+
                 TextInput::make('age_max')
                     ->label('Edad_maxima')
                     ->numeric(),
-                TextInput::make('breed_id')
-                    ->label('Raza_id')
-                    ->required()
-                    ->numeric(),
+
+                Select::make('breed_id')
+                    ->label('Raza')
+                    ->options(Breed::pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->required(),
             ]);
     }
 }

@@ -22,10 +22,12 @@ class BreedResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static ?string $recordTitleAttribute = 'Breed';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Raza';
+
     protected static ?string $modelLabel = 'Raza';
+
     protected static ?string $pluralModelLabel = 'Razas';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,37 @@ class BreedResource extends Resource
     public static function table(Table $table): Table
     {
         return BreedsTable::configure($table);
+    }
+
+    /**
+     * Campos que buscará la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'species.name',
+            'size',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información que aparece debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Especie' => $record->species?->name ?? 'Sin especie',
+            'Tamaño' => $record->size ?? 'Sin tamaño',
+        ];
     }
 
     public static function getRelations(): array

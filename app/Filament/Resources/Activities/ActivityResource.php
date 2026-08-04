@@ -22,7 +22,7 @@ class ActivityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBolt;
 
-    protected static ?string $recordTitleAttribute = 'activity.php';
+    protected static ?string $recordTitleAttribute = 'type';
 
     protected static ?string $navigationLabel = 'Actividad';
 
@@ -43,6 +43,36 @@ class ActivityResource extends Resource
     public static function table(Table $table): Table
     {
         return ActivitiesTable::configure($table);
+    }
+
+    /**
+     * CAMPOS QUE SE BUSCARÁN EN LA BARRA SUPERIOR
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'type',
+            'pet.name',
+        ];
+    }
+
+    /**
+     * TÍTULO DEL RESULTADO
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->type;
+    }
+
+    /**
+     * INFORMACIÓN ADICIONAL DEL RESULTADO
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Mascota' => $record->pet?->name ?? 'Sin mascota',
+            'Fecha' => optional($record->date_time)?->format('d/m/Y H:i'),
+        ];
     }
 
     public static function getRelations(): array

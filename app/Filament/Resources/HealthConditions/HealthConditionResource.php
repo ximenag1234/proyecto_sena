@@ -22,10 +22,12 @@ class HealthConditionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
 
-    protected static ?string $recordTitleAttribute = 'Healthcondition.php';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Condición de salud';
+
     protected static ?string $modelLabel = 'Condición de salud';
+
     protected static ?string $pluralModelLabel = 'Condiciones de salud';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,34 @@ class HealthConditionResource extends Resource
     public static function table(Table $table): Table
     {
         return HealthConditionsTable::configure($table);
+    }
+
+    /**
+     * Campos que buscará la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Condición' => $record->name,
+        ];
     }
 
     public static function getRelations(): array

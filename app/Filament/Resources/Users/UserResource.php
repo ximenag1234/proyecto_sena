@@ -22,10 +22,12 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static ?string $recordTitleAttribute = 'User.php';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Usuario';
+
     protected static ?string $modelLabel = 'Usuario';
+
     protected static ?string $pluralModelLabel = 'Usuarios';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,38 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return UsersTable::configure($table);
+    }
+
+    /**
+     * Campos que buscará la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'email',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Correo' => $record->email,
+            'Verificado' => $record->email_verified_at
+                ? 'Sí'
+                : 'No',
+        ];
     }
 
     public static function getRelations(): array

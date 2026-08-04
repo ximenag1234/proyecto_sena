@@ -20,10 +20,12 @@ class SpeciesResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Especies';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Especie';
+
     protected static ?string $modelLabel = 'Especie';
+
     protected static ?string $pluralModelLabel = 'Especies';
 
     public static function form(Schema $schema): Schema
@@ -34,6 +36,34 @@ class SpeciesResource extends Resource
     public static function table(Table $table): Table
     {
         return SpeciesTable::configure($table);
+    }
+
+    /**
+     * Campos que se buscarán en la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+        ];
+    }
+
+    /**
+     * Título del resultado de búsqueda.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Especie' => $record->name,
+        ];
     }
 
     public static function getRelations(): array

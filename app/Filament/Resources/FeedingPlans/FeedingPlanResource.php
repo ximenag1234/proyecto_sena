@@ -22,10 +22,12 @@ class FeedingPlanResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCake;
 
-    protected static ?string $recordTitleAttribute = 'FeedingPlan.php';
+    protected static ?string $recordTitleAttribute = 'food_type';
 
     protected static ?string $navigationLabel = 'Plan de alimentación';
+
     protected static ?string $modelLabel = 'Plan de alimentación';
+
     protected static ?string $pluralModelLabel = 'Planes de alimentación';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,39 @@ class FeedingPlanResource extends Resource
     public static function table(Table $table): Table
     {
         return FeedingPlansTable::configure($table);
+    }
+
+    /**
+     * Campos que se buscarán en la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'food_type',
+            'amount',
+            'frequency',
+            'breed.name',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->food_type;
+    }
+
+    /**
+     * Información adicional mostrada debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Raza' => $record->breed?->name ?? 'Sin raza',
+            'Cantidad' => $record->amount,
+            'Frecuencia' => $record->frequency,
+        ];
     }
 
     public static function getRelations(): array

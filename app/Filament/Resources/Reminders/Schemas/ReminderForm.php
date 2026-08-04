@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Reminders\Schemas;
 
+use App\Models\Pet;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -15,16 +17,21 @@ class ReminderForm
                 TextInput::make('type')
                     ->label('Tipo')
                     ->required(),
+
                 DateTimePicker::make('date_time')
-                    ->label('Feacha_tiempo')
+                    ->label('Fecha y hora')
                     ->required(),
+
                 TextInput::make('status')
-                    ->label('Estrato')
+                    ->label('Estado')
                     ->required(),
-                TextInput::make('pet_id')
-                    ->label('Mascota_id')
-                    ->required()
-                    ->numeric(),
+
+                Select::make('pet_id')
+                    ->label('Mascota')
+                    ->options(Pet::pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->required(),
             ]);
     }
 }

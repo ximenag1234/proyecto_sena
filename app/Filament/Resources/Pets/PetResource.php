@@ -18,16 +18,16 @@ use Filament\Tables\Table;
 
 class PetResource extends Resource
 {
-    
-    
     protected static ?string $model = Pet::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFaceSmile;
 
-    protected static ?string $recordTitleAttribute = 'Pet.php';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Mascota';
+
     protected static ?string $modelLabel = 'Mascota';
+
     protected static ?string $pluralModelLabel = 'Mascotas';
 
     public static function form(Schema $schema): Schema
@@ -43,6 +43,40 @@ class PetResource extends Resource
     public static function table(Table $table): Table
     {
         return PetsTable::configure($table);
+    }
+
+    /**
+     * Campos que buscará la barra superior de Filament.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'breed.name',
+            'user.name',
+            'species',
+        ];
+    }
+
+    /**
+     * Título que aparecerá en el resultado de búsqueda.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Dueño' => $record->user?->name ?? 'Sin dueño',
+            'Raza' => $record->breed?->name ?? 'Sin raza',
+            'Especie' => $record->species ?? 'Sin especie',
+            'Peso' => $record->weight . ' kg',
+        ];
     }
 
     public static function getRelations(): array

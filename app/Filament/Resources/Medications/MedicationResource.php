@@ -22,10 +22,12 @@ class MedicationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
-    protected static ?string $recordTitleAttribute = 'Medication.php';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Medicamento';
+
     protected static ?string $modelLabel = 'Medicamento';
+
     protected static ?string $pluralModelLabel = 'Medicamentos';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,34 @@ class MedicationResource extends Resource
     public static function table(Table $table): Table
     {
         return MedicationsTable::configure($table);
+    }
+
+    /**
+     * Campos que buscará la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Medicamento' => $record->name,
+        ];
     }
 
     public static function getRelations(): array

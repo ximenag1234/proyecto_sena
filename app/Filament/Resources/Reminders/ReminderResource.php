@@ -22,10 +22,12 @@ class ReminderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBellAlert;
 
-    protected static ?string $recordTitleAttribute = 'Reminder.php';
+    protected static ?string $recordTitleAttribute = 'type';
 
     protected static ?string $navigationLabel = 'Recordatorio';
+
     protected static ?string $modelLabel = 'Recordatorio';
+
     protected static ?string $pluralModelLabel = 'Recordatorios';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,38 @@ class ReminderResource extends Resource
     public static function table(Table $table): Table
     {
         return RemindersTable::configure($table);
+    }
+
+    /**
+     * Campos que se buscarán desde la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'type',
+            'status',
+            'pet.name',
+        ];
+    }
+
+    /**
+     * Título del resultado.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->type;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Mascota' => $record->pet?->name ?? 'Sin mascota',
+            'Estado' => $record->status ?? 'Sin estado',
+            'Fecha' => optional($record->date_time)?->format('d/m/Y H:i'),
+        ];
     }
 
     public static function getRelations(): array

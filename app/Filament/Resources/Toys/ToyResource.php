@@ -22,10 +22,12 @@ class ToyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
 
-    protected static ?string $recordTitleAttribute = 'Toy.php';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Juguete';
+
     protected static ?string $modelLabel = 'Juguete';
+
     protected static ?string $pluralModelLabel = 'Juguetes';
 
     public static function form(Schema $schema): Schema
@@ -41,6 +43,35 @@ class ToyResource extends Resource
     public static function table(Table $table): Table
     {
         return ToysTable::configure($table);
+    }
+
+    /**
+     * Campos que se buscarán en la barra superior.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'type',
+        ];
+    }
+
+    /**
+     * Título del resultado de búsqueda.
+     */
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    /**
+     * Información adicional debajo del resultado.
+     */
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Tipo' => $record->type ?? 'Sin tipo',
+        ];
     }
 
     public static function getRelations(): array
