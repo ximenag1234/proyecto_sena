@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\Activities\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ActivityForm
 {
@@ -14,44 +14,106 @@ class ActivityForm
     {
         return $schema
             ->components([
-                Select::make('type')
-    ->label('Tipo')
-    ->options([
-        'Juego' => 'Juego',
-        'Paseo' => 'Paseo',
-        'Entrenamiento' => 'Entrenamiento',
-        'Ejercicio' => 'Ejercicio',
-        'Socialización' => 'Socialización',
-        'Descanso' => 'Descanso',
-        'Alimentación' => 'Alimentación',
-        'Higiene y Aseo' => 'Higiene y Aseo',
-        'Caza e Instinto' => 'Caza e Instinto',
-        'Masticación' => 'Masticación',
-        'Exploración' => 'Exploración',
-        'Estimulación Mental' => 'Estimulación Mental',
-        'Agilidad' => 'Agilidad',
-        'Natación' => 'Natación',
-        'Búsqueda y Rastreo' => 'Búsqueda y Rastreo',
-        'Tirar y Aflojar' => 'Tirar y Aflojar',
-        'Lanzar y Recoger' => 'Lanzar y Recoger',
-        'Escalada' => 'Escalada',
-        'Observación y Vigilancia' => 'Observación y Vigilancia',
-        'Transporte y Viaje' => 'Transporte y Viaje',
-    ])
-    ->searchable()
-    ->required(),
-                DateTimePicker::make('date_time')
-                    ->label('Fecha_hora')
-                    ->required(),
-                Textarea::make('description')
-                    ->label('Descripcion')
-                    ->columnSpanFull(),
-                Select::make('pet_id')
-    ->label('Mascota')
-    ->relationship('pet', 'name')
-    ->searchable()
-    ->preload()
-    ->required(),
+
+                // ==========================================
+                // INFORMACIÓN DE LA ACTIVIDAD
+                // ==========================================
+
+                Section::make('Información de la actividad')
+                    ->description(
+                        'Registra una actividad realizada por la mascota.'
+                    )
+                    ->icon('heroicon-o-bolt')
+                    ->iconColor('warning')
+                    ->columns(2)
+                    ->schema([
+
+                        Select::make('type')
+                            ->label('Tipo de actividad')
+                            ->placeholder('Selecciona el tipo de actividad')
+                            ->options([
+                                'Juego' => '🎮 Juego',
+                                'Paseo' => '🚶 Paseo',
+                                'Entrenamiento' => '🏆 Entrenamiento',
+                                'Ejercicio' => '💪 Ejercicio',
+                                'Socialización' => '👥 Socialización',
+                                'Descanso' => '😴 Descanso',
+                                'Alimentación' => '🍖 Alimentación',
+                                'Higiene y Aseo' => '🛁 Higiene y Aseo',
+                                'Caza e Instinto' => '🐾 Caza e Instinto',
+                                'Masticación' => '🦴 Masticación',
+                                'Exploración' => '🔎 Exploración',
+                                'Estimulación Mental' => '🧠 Estimulación Mental',
+                                'Agilidad' => '⚡ Agilidad',
+                                'Natación' => '🏊 Natación',
+                                'Búsqueda y Rastreo' => '🔍 Búsqueda y Rastreo',
+                                'Tirar y Aflojar' => '🪢 Tirar y Aflojar',
+                                'Lanzar y Recoger' => '🎾 Lanzar y Recoger',
+                                'Escalada' => '🧗 Escalada',
+                                'Observación y Vigilancia' => '👀 Observación y Vigilancia',
+                                'Transporte y Viaje' => '🚗 Transporte y Viaje',
+                            ])
+                            ->prefixIcon('heroicon-o-sparkles')
+                            ->searchable()
+                            ->native(false)
+                            ->required()
+                            ->helperText(
+                                'Selecciona el tipo de actividad realizada.'
+                            ),
+
+                        DateTimePicker::make('date_time')
+                            ->label('Fecha y hora')
+                            ->placeholder('Selecciona fecha y hora')
+                            ->prefixIcon('heroicon-o-calendar')
+                            ->native(false)
+                            ->seconds(false)
+                            ->displayFormat('d/m/Y H:i')
+                            ->required()
+                            ->helperText(
+                                'Indica cuándo se realizó la actividad.'
+                            ),
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->relationship('pet', 'name')
+                            ->prefixIcon('heroicon-o-heart')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
+                            ->helperText(
+                                'Selecciona la mascota que realizó la actividad.'
+                            ),
+
+                    ]),
+
+                // ==========================================
+                // DESCRIPCIÓN
+                // ==========================================
+
+                Section::make('Detalles de la actividad')
+                    ->description(
+                        'Añade información adicional sobre la actividad realizada.'
+                    )
+                    ->icon('heroicon-o-document-text')
+                    ->iconColor('primary')
+                    ->schema([
+
+                        Textarea::make('description')
+                            ->label('Descripción')
+                            ->placeholder(
+                                'Describe qué hizo la mascota, cuánto tiempo duró, cómo se comportó, etc.'
+                            )
+                            ->rows(5)
+                            ->maxLength(1000)
+                            ->columnSpanFull()
+                            ->helperText(
+                                'Puedes agregar observaciones o detalles importantes de la actividad.'
+                            ),
+
+                    ]),
             ]);
     }
 }
+

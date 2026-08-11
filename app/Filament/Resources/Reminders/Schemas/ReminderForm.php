@@ -6,6 +6,7 @@ use App\Models\Pet;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class ReminderForm
@@ -14,24 +15,70 @@ class ReminderForm
     {
         return $schema
             ->components([
-                TextInput::make('type')
-                    ->label('Tipo')
-                    ->required(),
 
-                DateTimePicker::make('date_time')
-                    ->label('Fecha y hora')
-                    ->required(),
+                // ==========================================
+                // INFORMACIÓN DEL RECORDATORIO
+                // ==========================================
 
-                TextInput::make('status')
-                    ->label('Estado')
-                    ->required(),
+                Section::make('Información del recordatorio')
+                    ->description(
+                        'Programa y administra los recordatorios relacionados con las mascotas.'
+                    )
+                    ->icon('heroicon-o-bell')
+                    ->iconColor('warning')
+                    ->columns(2)
+                    ->schema([
 
-                Select::make('pet_id')
-                    ->label('Mascota')
-                    ->options(Pet::pluck('name', 'id'))
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+                        TextInput::make('type')
+                            ->label('Tipo de recordatorio')
+                            ->placeholder('Ej: Vacunación, baño, medicamento...')
+                            ->prefixIcon('heroicon-o-bell')
+                            ->required()
+                            ->maxLength(100)
+                            ->helperText(
+                                'Indica qué tipo de recordatorio deseas registrar.'
+                            ),
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(
+                                Pet::query()
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                            )
+                            ->prefixIcon('heroicon-o-heart')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
+                            ->helperText(
+                                'Selecciona la mascota asociada al recordatorio.'
+                            ),
+
+                        DateTimePicker::make('date_time')
+                            ->label('Fecha y hora')
+                            ->placeholder('Selecciona fecha y hora')
+                            ->prefixIcon('heroicon-o-calendar')
+                            ->native(false)
+                            ->seconds(false)
+                            ->displayFormat('d/m/Y H:i')
+                            ->required()
+                            ->helperText(
+                                'Indica cuándo debe cumplirse el recordatorio.'
+                            ),
+
+                        TextInput::make('status')
+                            ->label('Estado')
+                            ->placeholder('Ej: Pendiente')
+                            ->prefixIcon('heroicon-o-check-circle')
+                            ->required()
+                            ->maxLength(50)
+                            ->helperText(
+                                'Indica el estado actual del recordatorio.'
+                            ),
+
+                    ]),
             ]);
     }
 }
