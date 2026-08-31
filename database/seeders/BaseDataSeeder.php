@@ -4,12 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class BaseDataSeeder extends Seeder
 {
     public function run(): void
     {
         $this->call([
-            // Datos base
             SpeciesSeeder::class,
             BreedSeeder::class,
             HealthConditionSeeder::class,
@@ -18,16 +17,7 @@ class DatabaseSeeder extends Seeder
             BathRoutineSeeder::class,
             FeedingPlanSeeder::class,
             MedicationDoseSeeder::class,
-
-            // Roles y permisos de Shield
-            
-            // Usuarios
-            UserSeeder::class,
-
-            // Mascotas
             PetSeeder::class,
-
-            // Datos relacionados
             ReminderSeeder::class,
             ActivitySeeder::class,
         ]);

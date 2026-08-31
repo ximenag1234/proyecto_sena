@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Breed;
 use App\Models\Pet;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +17,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2020-03-15',
                 'weight' => 25.5,
                 'user_id' => 1,
-                'breed_id' => 1,
+                'breed' => 'Labrador Retriever',
             ],
             [
                 'name' => 'Luna',
@@ -24,7 +25,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2021-07-10',
                 'weight' => 4.2,
                 'user_id' => 1,
-                'breed_id' => 2,
+                'breed' => 'Persa',
             ],
             [
                 'name' => 'Rocky',
@@ -32,7 +33,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2019-11-20',
                 'weight' => 30.0,
                 'user_id' => 2,
-                'breed_id' => 3,
+                'breed' => 'Pastor Alemán',
             ],
             [
                 'name' => 'Milo',
@@ -40,7 +41,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2022-01-05',
                 'weight' => 3.8,
                 'user_id' => 2,
-                'breed_id' => 4,
+                'breed' => 'Siamés',
             ],
             [
                 'name' => 'Bella',
@@ -48,7 +49,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2018-09-12',
                 'weight' => 18.7,
                 'user_id' => 5,
-                'breed_id' => 5,
+                'breed' => 'Golden Retriever',
             ],
             [
                 'name' => 'Simba',
@@ -56,7 +57,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2020-05-22',
                 'weight' => 5.1,
                 'user_id' => 3,
-                'breed_id' => 6,
+                'breed' => 'Persa',
             ],
             [
                 'name' => 'Toby',
@@ -64,7 +65,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2021-12-01',
                 'weight' => 12.4,
                 'user_id' => 4,
-                'breed_id' => 7,
+                'breed' => 'Labrador Retriever',
             ],
             [
                 'name' => 'Nala',
@@ -72,7 +73,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2019-04-18',
                 'weight' => 4.6,
                 'user_id' => 4,
-                'breed_id' => 8,
+                'breed' => 'Siamés',
             ],
             [
                 'name' => 'Bruno',
@@ -80,7 +81,7 @@ class PetSeeder extends Seeder
                 'birth_date' => '2023-02-14',
                 'weight' => 8.9,
                 'user_id' => 5,
-                'breed_id' => 9,
+                'breed' => 'Golden Retriever',
             ],
             [
                 'name' => 'Coco',
@@ -88,13 +89,24 @@ class PetSeeder extends Seeder
                 'birth_date' => '2022-08-30',
                 'weight' => 6.3,
                 'user_id' => 5,
-                'breed_id' => 10,
+                'breed' => 'Labrador Retriever',
             ],
         ];
 
-        // Registrar cada mascota en la base de datos
         foreach ($mascotas as $mascota) {
-            Pet::create($mascota);
+
+            $breed = Breed::where('name', $mascota['breed'])
+                ->where('species', $mascota['species'])
+                ->firstOrFail();
+
+            Pet::create([
+                'name' => $mascota['name'],
+                'species' => $mascota['species'],
+                'birth_date' => $mascota['birth_date'],
+                'weight' => $mascota['weight'],
+                'user_id' => $mascota['user_id'],
+                'breed_id' => $breed->id,
+            ]);
         }
     }
 }
