@@ -21,6 +21,11 @@ class UsersTable
 
             ->columns([
 
+                /*
+                |--------------------------------------------------------------------------
+                | Usuario
+                |--------------------------------------------------------------------------
+                */
                 TextColumn::make('name')
                     ->label('👤 Usuario')
                     ->weight(FontWeight::Bold)
@@ -31,6 +36,11 @@ class UsersTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                |--------------------------------------------------------------------------
+                | Correo electrónico
+                |--------------------------------------------------------------------------
+                */
                 TextColumn::make('email')
                     ->label('📧 Correo electrónico')
                     ->badge()
@@ -42,6 +52,31 @@ class UsersTable
                     ->searchable()
                     ->sortable(),
 
+                /*
+                |--------------------------------------------------------------------------
+                | Roles - Filament Shield / Spatie Permission
+                |--------------------------------------------------------------------------
+                */
+                TextColumn::make('roles.name')
+                    ->label('🛡️ Roles')
+                    ->badge()
+                    ->icon('heroicon-m-shield-check')
+                    ->separator(',')
+                    ->color(fn (string $state): string => match ($state) {
+                        'Super Admin' => 'danger',
+                        'Admin' => 'warning',
+                        'Administrador' => 'warning',
+                        'Usuario' => 'info',
+                        default => 'gray',
+                    })
+                    ->searchable()
+                    ->sortable(),
+
+                /*
+                |--------------------------------------------------------------------------
+                | Estado del correo
+                |--------------------------------------------------------------------------
+                */
                 TextColumn::make('email_verified_at')
                     ->label('✅ Estado del correo')
                     ->badge()
@@ -59,6 +94,11 @@ class UsersTable
                         : 'Este usuario aún no ha verificado su correo')
                     ->sortable(),
 
+                /*
+                |--------------------------------------------------------------------------
+                | Fecha de creación
+                |--------------------------------------------------------------------------
+                */
                 TextColumn::make('created_at')
                     ->label('➕ Creado')
                     ->icon('heroicon-m-plus-circle')
@@ -72,6 +112,11 @@ class UsersTable
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                /*
+                |--------------------------------------------------------------------------
+                | Fecha de actualización
+                |--------------------------------------------------------------------------
+                */
                 TextColumn::make('updated_at')
                     ->label('🔄 Actualizado')
                     ->icon('heroicon-m-arrow-path')
@@ -87,10 +132,20 @@ class UsersTable
 
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | Filtros
+            |--------------------------------------------------------------------------
+            */
             ->filters([
                 //
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | Acciones por registro
+            |--------------------------------------------------------------------------
+            */
             ->recordActions([
 
                 ViewAction::make()
@@ -107,16 +162,33 @@ class UsersTable
 
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | Acciones masivas
+            |--------------------------------------------------------------------------
+            */
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | Estado vacío
+            |--------------------------------------------------------------------------
+            */
             ->emptyStateIcon('heroicon-o-users')
             ->emptyStateHeading('No hay usuarios registrados')
-            ->emptyStateDescription('Cuando registres un usuario aparecerá aquí.')
+            ->emptyStateDescription(
+                'Cuando registres un usuario aparecerá aquí.'
+            )
 
+            /*
+            |--------------------------------------------------------------------------
+            | Paginación
+            |--------------------------------------------------------------------------
+            */
             ->paginated([10, 25, 50]);
     }
 }

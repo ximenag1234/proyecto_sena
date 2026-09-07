@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -49,6 +50,28 @@ class UserForm
                                 'Utiliza una dirección de correo válida.'
                             ),
 
+                        // ==========================================
+                        // ROLES
+                        // ==========================================
+
+                        Select::make('roles')
+                            ->label('🛡️ Roles')
+                            ->placeholder('Selecciona uno o varios roles')
+                            ->prefixIcon('heroicon-o-shield-check')
+                            ->relationship(
+                                name: 'roles',
+                                titleAttribute: 'name',
+                            )
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
+                            ->helperText(
+                                'Selecciona uno o varios roles para este usuario.'
+                            )
+                            ->columnSpanFull(),
+
                     ]),
 
                 // ==========================================
@@ -71,9 +94,13 @@ class UserForm
                             ->password()
                             ->revealable()
                             ->minLength(8)
-                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->required(
+                                fn (string $operation): bool =>
+                                    $operation === 'create'
+                            )
                             ->dehydrated(
-                                fn (?string $state): bool => filled($state)
+                                fn (?string $state): bool =>
+                                    filled($state)
                             )
                             ->helperText(
                                 'Mínimo 8 caracteres. Déjalo vacío al editar si no deseas cambiarla.'
