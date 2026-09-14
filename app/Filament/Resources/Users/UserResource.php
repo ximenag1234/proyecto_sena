@@ -30,6 +30,14 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Usuarios';
 
+    /**
+     * Solo los administradores pueden acceder a este recurso.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->check() && auth()->user()->hasRole('admin');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);

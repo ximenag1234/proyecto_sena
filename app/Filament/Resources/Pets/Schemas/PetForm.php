@@ -99,30 +99,44 @@ class PetForm
                                     ->orderBy('name')
                                     ->pluck('name', 'id')
                             )
+                            ->default(
+                                fn () => auth()->id()
+                            )
                             ->prefixIcon('heroicon-o-user')
                             ->searchable()
                             ->preload()
                             ->native(false)
                             ->required()
+                            ->visible(
+                                fn () => auth()->user()?->hasRole('admin')
+                            )
                             ->helperText(
-                                'Persona responsable de la mascota.'
+                                'Solo el administrador puede seleccionar el propietario.'
                             ),
 
                         Select::make('breed_id')
                             ->label('Raza')
                             ->placeholder('Selecciona la raza')
-                            ->options(
-                                Breed::query()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                            )
+                            ->options(function () {
+                                $query = Breed::query()
+                                    ->orderBy('name');
+
+                                if (! auth()->user()?->hasRole('admin')) {
+                                    $query->where(
+                                        'user_id',
+                                        auth()->id()
+                                    );
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
                             ->prefixIcon('heroicon-o-tag')
                             ->searchable()
                             ->preload()
                             ->native(false)
                             ->required()
                             ->helperText(
-                                'Selecciona la raza correspondiente.'
+                                'Solo podrás seleccionar las razas disponibles para ti.'
                             ),
 
                     ]),

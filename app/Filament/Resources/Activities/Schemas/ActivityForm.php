@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Activities\Schemas;
 
+use App\Models\Pet;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -76,7 +77,21 @@ class ActivityForm
                         Select::make('pet_id')
                             ->label('Mascota')
                             ->placeholder('Selecciona una mascota')
-                            ->relationship('pet', 'name')
+                            ->options(function () {
+
+                                // Admin: puede ver todas las mascotas.
+                                if (auth()->user()?->hasRole('admin')) {
+                                    return Pet::query()
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id');
+                                }
+
+                                // Usuario normal: solo sus propias mascotas.
+                                return Pet::query()
+                                    ->where('user_id', auth()->id())
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id');
+                            })
                             ->prefixIcon('heroicon-o-heart')
                             ->searchable()
                             ->preload()
@@ -116,4 +131,3 @@ class ActivityForm
             ]);
     }
 }
-

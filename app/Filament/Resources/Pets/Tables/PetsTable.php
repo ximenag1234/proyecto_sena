@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Pets\Tables;
 
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -37,16 +38,18 @@ class PetsTable
                     ->label('🦴 Especie')
                     ->badge()
                     ->weight(FontWeight::Bold)
-                    ->icon(fn ($state) => match ($state) {
-                        'Perro' => 'heroicon-m-shield-check',
-                        'Gato' => 'heroicon-m-heart',
-                        'Ave' => 'heroicon-m-cloud',
-                        default => 'heroicon-m-paw-print',
+                    ->icon(fn ($state) => match (strtolower($state ?? '')) {
+                        'perro' => 'heroicon-m-shield-check',
+                        'gato' => 'heroicon-m-heart',
+                        'ave' => 'heroicon-m-cloud',
+                        'conejo' => 'heroicon-m-heart',
+                        'hamster' => 'heroicon-m-heart',
+                        default => 'heroicon-m-heart',
                     })
-                    ->color(fn ($state) => match ($state) {
-                        'Perro' => 'success',
-                        'Gato' => 'warning',
-                        'Ave' => 'info',
+                    ->color(fn ($state) => match (strtolower($state ?? '')) {
+                        'perro' => 'success',
+                        'gato' => 'warning',
+                        'ave' => 'info',
                         default => 'gray',
                     }),
 
@@ -148,17 +151,28 @@ class PetsTable
                     ->color('warning')
                     ->tooltip('Editar mascota'),
 
+                DeleteAction::make()
+                    ->label('')
+                    ->icon('heroicon-m-trash')
+                    ->color('danger')
+                    ->tooltip('Eliminar mascota'),
+
             ])
 
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () =>
+                            auth()->user()?->hasRole('admin')
+                        ),
                 ]),
             ])
 
             ->emptyStateIcon('heroicon-o-heart')
             ->emptyStateHeading('No hay mascotas registradas')
-            ->emptyStateDescription('Cuando registres una mascota aparecerá aquí.')
+            ->emptyStateDescription(
+                'Cuando registres una mascota aparecerá aquí.'
+            )
 
             ->paginated([10, 25, 50]);
     }

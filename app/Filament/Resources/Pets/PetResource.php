@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PetResource extends Resource
 {
@@ -46,8 +48,95 @@ class PetResource extends Resource
     }
 
     /**
-     * Campos que buscará la barra superior de Filament.
+     * Permite acceder al recurso únicamente a usuarios autenticados.
      */
+    public static function canAccess(): bool
+    {
+        return auth()->check();
+    }
+
+    /**
+     * Admin y user pueden consultar mascotas.
+     */
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    /**
+     * Limita las mascotas que aparecen en las consultas.
+     *
+     * ADMIN:
+     * Puede ver todas.
+     *
+     * USER:
+     * Solo puede ver sus propias mascotas.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! auth()->check()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', auth()->id());
+    }
+
+    /**
+     * Protege la visualización de una mascota específica.
+     */
+    public static function canView(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Solo el admin puede editar cualquier mascota.
+     * El user puede editar únicamente sus propias mascotas.
+     */
+    public static function canEdit(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Solo el admin puede eliminar cualquier mascota.
+     * El user puede eliminar únicamente sus propias mascotas.
+     */
+    public static function canDelete(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -58,17 +147,11 @@ class PetResource extends Resource
         ];
     }
 
-    /**
-     * Título que aparecerá en el resultado de búsqueda.
-     */
     public static function getGlobalSearchResultTitle($record): string
     {
         return $record->name;
     }
 
-    /**
-     * Información adicional debajo del resultado.
-     */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
@@ -81,9 +164,7 @@ class PetResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

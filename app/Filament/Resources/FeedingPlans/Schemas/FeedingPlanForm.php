@@ -85,11 +85,19 @@ class FeedingPlanForm
                         Select::make('breed_id')
                             ->label('Raza')
                             ->placeholder('Selecciona una raza')
-                            ->options(
-                                Breed::query()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                            )
+                            ->options(function () {
+                                $query = Breed::query()
+                                    ->orderBy('name');
+
+                                if (! auth()->user()?->hasRole('admin')) {
+                                    $query->where(
+                                        'user_id',
+                                        auth()->id()
+                                    );
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
                             ->prefixIcon('heroicon-o-tag')
                             ->searchable()
                             ->preload()

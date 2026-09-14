@@ -4,21 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Toy extends Model
 {
     use HasFactory;
 
-    // Opcional
     protected $table = 'toys';
 
     protected $fillable = [
         'name',
         'type',
         'description',
+        'user_id',
     ];
 
-    // Relación muchos a muchos con Breed
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function breeds()
     {
         return $this->belongsToMany(

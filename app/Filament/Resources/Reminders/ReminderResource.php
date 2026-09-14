@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ReminderResource extends Resource
 {
@@ -46,8 +48,92 @@ class ReminderResource extends Resource
     }
 
     /**
-     * Campos que se buscarán desde la barra superior.
+     * Admin y user pueden consultar recordatorios.
      */
+    public static function canAccess(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    /**
+     * Filtra los recordatorios según el propietario de la mascota.
+     *
+     * ADMIN:
+     * Puede ver todos.
+     *
+     * USER:
+     * Solo puede ver recordatorios de sus propias mascotas.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! auth()->check()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->whereHas('pet', function (Builder $petQuery) {
+            $petQuery->where('user_id', auth()->id());
+        });
+    }
+
+    /**
+     * Protege la visualización de un recordatorio específico.
+     */
+    public static function canView(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Protege la edición.
+     */
+    public static function canEdit(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Protege la eliminación.
+     */
+    public static function canDelete(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -57,17 +143,11 @@ class ReminderResource extends Resource
         ];
     }
 
-    /**
-     * Título del resultado.
-     */
     public static function getGlobalSearchResultTitle($record): string
     {
         return $record->type;
     }
 
-    /**
-     * Información adicional debajo del resultado.
-     */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
@@ -79,9 +159,7 @@ class ReminderResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

@@ -42,11 +42,23 @@ class ReminderForm
                         Select::make('pet_id')
                             ->label('Mascota')
                             ->placeholder('Selecciona una mascota')
-                            ->options(
-                                Pet::query()
+                            ->options(function () {
+
+                                // ADMIN:
+                                // Puede seleccionar cualquier mascota.
+                                if (auth()->user()?->hasRole('admin')) {
+                                    return Pet::query()
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id');
+                                }
+
+                                // USUARIO NORMAL:
+                                // Solo puede seleccionar sus propias mascotas.
+                                return Pet::query()
+                                    ->where('user_id', auth()->id())
                                     ->orderBy('name')
-                                    ->pluck('name', 'id')
-                            )
+                                    ->pluck('name', 'id');
+                            })
                             ->prefixIcon('heroicon-o-heart')
                             ->searchable()
                             ->preload()

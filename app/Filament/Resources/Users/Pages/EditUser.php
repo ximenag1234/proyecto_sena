@@ -18,4 +18,14 @@ class EditUser extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    public function mount(int|string $record): void
+    {
+        abort_unless(
+            auth()->check() && auth()->user()->hasRole('admin'),
+            403
+        );
+
+        parent::mount($record);
+    }
 }

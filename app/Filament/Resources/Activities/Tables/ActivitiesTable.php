@@ -18,6 +18,7 @@ class ActivitiesTable
         return $table
             ->defaultSort('date_time', 'desc')
             ->striped()
+
             ->columns([
 
                 TextColumn::make('type')
@@ -56,10 +57,19 @@ class ActivitiesTable
                     ->label('📅 Fecha programada')
                     ->badge()
                     ->icon('heroicon-m-calendar-days')
-                    ->color(fn ($record) => Carbon::parse($record->date_time)->isPast() ? 'danger' : 'success')
+                    ->color(fn ($record) =>
+                        Carbon::parse($record->date_time)->isPast()
+                            ? 'danger'
+                            : 'success'
+                    )
                     ->dateTime('d/m/Y H:i')
-                    ->description(fn ($record) => Carbon::parse($record->date_time)->diffForHumans())
-                    ->tooltip(fn ($record) => Carbon::parse($record->date_time)->translatedFormat('l d \\d\\e F \\d\\e Y - H:i'))
+                    ->description(fn ($record) =>
+                        Carbon::parse($record->date_time)->diffForHumans()
+                    )
+                    ->tooltip(fn ($record) =>
+                        Carbon::parse($record->date_time)
+                            ->translatedFormat('l d \\d\\e F \\d\\e Y - H:i')
+                    )
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -67,8 +77,12 @@ class ActivitiesTable
                     ->icon('heroicon-m-plus-circle')
                     ->badge()
                     ->color('success')
-                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->diffForHumans())
-                    ->tooltip(fn ($record) => Carbon::parse($record->created_at)->format('d/m/Y H:i'))
+                    ->formatStateUsing(fn ($state) =>
+                        Carbon::parse($state)->diffForHumans()
+                    )
+                    ->tooltip(fn ($record) =>
+                        Carbon::parse($record->created_at)->format('d/m/Y H:i')
+                    )
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
@@ -76,8 +90,12 @@ class ActivitiesTable
                     ->icon('heroicon-m-arrow-path')
                     ->badge()
                     ->color('warning')
-                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->diffForHumans())
-                    ->tooltip(fn ($record) => Carbon::parse($record->updated_at)->format('d/m/Y H:i'))
+                    ->formatStateUsing(fn ($state) =>
+                        Carbon::parse($state)->diffForHumans()
+                    )
+                    ->tooltip(fn ($record) =>
+                        Carbon::parse($record->updated_at)->format('d/m/Y H:i')
+                    )
                     ->toggleable(isToggledHiddenByDefault: true),
 
             ])
@@ -98,13 +116,18 @@ class ActivitiesTable
                     ->label('')
                     ->icon('heroicon-m-pencil-square')
                     ->color('warning')
-                    ->tooltip('Editar actividad'),
-
+                    ->tooltip('Editar actividad')
+                    ->visible(fn () =>
+                        auth()->user()?->hasRole('admin')
+                    ),
             ])
 
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () =>
+                            auth()->user()?->hasRole('admin')
+                        ),
                 ]),
             ])
 

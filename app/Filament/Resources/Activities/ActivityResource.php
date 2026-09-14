@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ActivityResource extends Resource
 {
@@ -46,8 +48,92 @@ class ActivityResource extends Resource
     }
 
     /**
-     * CAMPOS QUE SE BUSCARÁN EN LA BARRA SUPERIOR
+     * Admin y user pueden consultar actividades.
      */
+    public static function canAccess(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    /**
+     * Filtra las actividades según el propietario de la mascota.
+     *
+     * ADMIN:
+     * Puede ver todas.
+     *
+     * USER:
+     * Solo puede ver actividades de sus propias mascotas.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! auth()->check()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->whereHas('pet', function (Builder $petQuery) {
+            $petQuery->where('user_id', auth()->id());
+        });
+    }
+
+    /**
+     * Protege la visualización de una actividad específica.
+     */
+    public static function canView(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Protege la edición.
+     */
+    public static function canEdit(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
+    /**
+     * Protege la eliminación.
+     */
+    public static function canDelete(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->pet?->user_id === (int) auth()->id();
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -56,17 +142,11 @@ class ActivityResource extends Resource
         ];
     }
 
-    /**
-     * TÍTULO DEL RESULTADO
-     */
     public static function getGlobalSearchResultTitle($record): string
     {
         return $record->type;
     }
 
-    /**
-     * INFORMACIÓN ADICIONAL DEL RESULTADO
-     */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
@@ -77,9 +157,7 @@ class ActivityResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

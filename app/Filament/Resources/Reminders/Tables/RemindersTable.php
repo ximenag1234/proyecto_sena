@@ -134,13 +134,18 @@ class RemindersTable
                     ->label('')
                     ->icon('heroicon-m-pencil-square')
                     ->color('warning')
-                    ->tooltip('Editar recordatorio'),
-
+                    ->tooltip('Editar recordatorio')
+                    ->visible(fn () =>
+                        auth()->user()?->hasRole('admin')
+                    ),
             ])
 
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () =>
+                            auth()->user()?->hasRole('admin')
+                        ),
                 ]),
             ])
 

@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class BathRoutineResource extends Resource
 {
@@ -22,7 +24,7 @@ class BathRoutineResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedStar;
 
-    protected static ?string $recordTitleAttribute = 'bath_type';
+    protected static ?string $recordTitleAttribute = 'frequency';
 
     protected static ?string $navigationLabel = 'Rutina de Baño';
 
@@ -45,42 +47,103 @@ class BathRoutineResource extends Resource
         return BathRoutinesTable::configure($table);
     }
 
-    /**
-     * Campos que buscará la barra superior.
-     */
+    public static function canAccess(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! auth()->check()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', auth()->id());
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
-            'bath_type',
             'frequency',
-            'pet.name',
+            'age_min',
+            'age_max',
+            'breed.name',
         ];
     }
 
-    /**
-     * Título del resultado.
-     */
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->bath_type ?? 'Rutina de Baño';
+        return 'Rutina: ' . ($record->frequency ?? 'Sin frecuencia');
     }
 
-    /**
-     * Información adicional del resultado.
-     */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            'Mascota' => $record->pet?->name ?? 'Sin mascota',
+            'Raza' => $record->breed?->name ?? 'Sin raza',
             'Frecuencia' => $record->frequency ?? 'No registrada',
+            'Edad mínima' => $record->age_min ?? 'No registrada',
+            'Edad máxima' => $record->age_max ?? 'No registrada',
         ];
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

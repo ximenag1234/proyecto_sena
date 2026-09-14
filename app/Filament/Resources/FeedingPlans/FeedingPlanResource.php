@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class FeedingPlanResource extends Resource
 {
@@ -45,9 +47,75 @@ class FeedingPlanResource extends Resource
         return FeedingPlansTable::configure($table);
     }
 
-    /**
-     * Campos que se buscarán en la barra superior.
-     */
+    public static function canAccess(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return true;
+        }
+
+        return (int) $record->user_id === (int) auth()->id();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! auth()->check()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', auth()->id());
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -58,17 +126,11 @@ class FeedingPlanResource extends Resource
         ];
     }
 
-    /**
-     * Título del resultado.
-     */
     public static function getGlobalSearchResultTitle($record): string
     {
         return $record->food_type;
     }
 
-    /**
-     * Información adicional mostrada debajo del resultado.
-     */
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
@@ -80,9 +142,7 @@ class FeedingPlanResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
