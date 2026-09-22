@@ -15,10 +15,6 @@ class ToyForm
         return $schema
             ->components([
 
-                // ==========================================
-                // INFORMACIÓN DEL JUGUETE
-                // ==========================================
-
                 Section::make('Información del juguete')
                     ->description(
                         'Registra un juguete y especifica su categoría y características.'
@@ -72,12 +68,7 @@ class ToyForm
                             ->helperText(
                                 'Selecciona la categoría que mejor describe el juguete.'
                             ),
-
                     ]),
-
-                // ==========================================
-                // DESCRIPCIÓN
-                // ==========================================
 
                 Section::make('Descripción del juguete')
                     ->description(
@@ -98,8 +89,8 @@ class ToyForm
                             ->helperText(
                                 'Incluye información que pueda ayudar a elegir o utilizar correctamente el juguete.'
                             ),
-
                     ]),
             ]);
     }
 }
+

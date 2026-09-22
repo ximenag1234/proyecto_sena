@@ -58,50 +58,16 @@ class FeedingPlansTable
                     ->weight(FontWeight::Bold)
                     ->searchable(),
 
-                TextColumn::make('age_min')
-                    ->label('🐶 Edad mínima')
+                // ==========================================
+                // MASCOTA
+                // ==========================================
+
+                TextColumn::make('pet.name')
+                    ->label('🐾 Mascota')
                     ->badge()
-                    ->icon('heroicon-m-calendar-days')
+                    ->icon('heroicon-m-face-smile')
                     ->color('success')
-                    ->suffix(' meses')
-                    ->numeric()
-                    ->sortable(),
-
-                TextColumn::make('age_max')
-                    ->label('🐕 Edad máxima')
-                    ->badge()
-                    ->icon('heroicon-m-calendar')
-                    ->color('info')
-                    ->suffix(' meses')
-                    ->numeric()
-                    ->sortable(),
-
-                TextColumn::make('weight_min')
-                    ->label('⚖ Peso mínimo')
-                    ->badge()
-                    ->icon('heroicon-m-scale')
-                    ->color('success')
-                    ->suffix(' kg')
-                    ->numeric()
-                    ->sortable(),
-
-                TextColumn::make('weight_max')
-                    ->label('⚖ Peso máximo')
-                    ->badge()
-                    ->icon('heroicon-m-scale')
-                    ->color('danger')
-                    ->suffix(' kg')
-                    ->numeric()
-                    ->sortable(),
-
-                TextColumn::make('breed.name')
-                    ->label('❤️ Raza')
-                    ->badge()
-                    ->icon('heroicon-m-heart')
-                    ->iconColor('danger')
                     ->weight(FontWeight::Bold)
-                    ->color('primary')
-                    ->description('Plan alimenticio')
                     ->searchable()
                     ->sortable(),
 
@@ -110,8 +76,13 @@ class FeedingPlansTable
                     ->icon('heroicon-m-plus-circle')
                     ->badge()
                     ->color('success')
-                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->diffForHumans())
-                    ->tooltip(fn ($record) => Carbon::parse($record->created_at)->format('d/m/Y H:i'))
+                    ->formatStateUsing(
+                        fn ($state) => Carbon::parse($state)->diffForHumans()
+                    )
+                    ->tooltip(
+                        fn ($record) => Carbon::parse($record->created_at)
+                            ->format('d/m/Y H:i')
+                    )
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
@@ -119,8 +90,13 @@ class FeedingPlansTable
                     ->icon('heroicon-m-arrow-path')
                     ->badge()
                     ->color('warning')
-                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->diffForHumans())
-                    ->tooltip(fn ($record) => Carbon::parse($record->updated_at)->format('d/m/Y H:i'))
+                    ->formatStateUsing(
+                        fn ($state) => Carbon::parse($state)->diffForHumans()
+                    )
+                    ->tooltip(
+                        fn ($record) => Carbon::parse($record->updated_at)
+                            ->format('d/m/Y H:i')
+                    )
                     ->toggleable(isToggledHiddenByDefault: true),
 
             ])
@@ -153,7 +129,9 @@ class FeedingPlansTable
 
             ->emptyStateIcon('heroicon-o-cake')
             ->emptyStateHeading('No hay planes alimenticios registrados')
-            ->emptyStateDescription('Cuando registres un plan alimenticio aparecerá aquí.')
+            ->emptyStateDescription(
+                'Cuando registres un plan alimenticio aparecerá aquí.'
+            )
 
             ->paginated([10, 25, 50]);
     }

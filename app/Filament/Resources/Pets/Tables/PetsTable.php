@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Pets\Tables;
 
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -28,8 +27,9 @@ class PetsTable
                     ->icon('heroicon-m-heart')
                     ->iconColor('danger')
                     ->color('primary')
-                    ->description(fn ($record) =>
-                        $record->breed?->name ?? 'Sin raza registrada'
+                    ->description(
+                        fn ($record) =>
+                            $record->breed?->name ?? 'Sin raza registrada'
                     )
                     ->searchable()
                     ->sortable(),
@@ -38,20 +38,24 @@ class PetsTable
                     ->label('🦴 Especie')
                     ->badge()
                     ->weight(FontWeight::Bold)
-                    ->icon(fn ($state) => match (strtolower($state ?? '')) {
-                        'perro' => 'heroicon-m-shield-check',
-                        'gato' => 'heroicon-m-heart',
-                        'ave' => 'heroicon-m-cloud',
-                        'conejo' => 'heroicon-m-heart',
-                        'hamster' => 'heroicon-m-heart',
-                        default => 'heroicon-m-heart',
-                    })
-                    ->color(fn ($state) => match (strtolower($state ?? '')) {
-                        'perro' => 'success',
-                        'gato' => 'warning',
-                        'ave' => 'info',
-                        default => 'gray',
-                    }),
+                    ->icon(
+                        fn ($state) => match (strtolower($state ?? '')) {
+                            'perro' => 'heroicon-m-heart',
+                            'gato' => 'heroicon-m-heart',
+                            'ave' => 'heroicon-m-cloud',
+                            'conejo' => 'heroicon-m-heart',
+                            'hamster' => 'heroicon-m-heart',
+                            default => 'heroicon-m-heart',
+                        }
+                    )
+                    ->color(
+                        fn ($state) => match (strtolower($state ?? '')) {
+                            'perro' => 'success',
+                            'gato' => 'warning',
+                            'ave' => 'info',
+                            default => 'gray',
+                        }
+                    ),
 
                 TextColumn::make('birth_date')
                     ->label('🎂 Fecha de nacimiento')
@@ -59,16 +63,18 @@ class PetsTable
                     ->icon('heroicon-m-calendar-days')
                     ->color('success')
                     ->date('d/m/Y')
-                    ->description(fn ($record) =>
-                        $record->birth_date
-                            ? Carbon::parse($record->birth_date)->age . ' años'
-                            : 'Sin registro'
+                    ->description(
+                        fn ($record) =>
+                            $record->birth_date
+                                ? Carbon::parse($record->birth_date)->age . ' años'
+                                : 'Sin registro'
                     )
-                    ->tooltip(fn ($record) =>
-                        $record->birth_date
-                            ? Carbon::parse($record->birth_date)
-                                ->translatedFormat('l d \\d\\e F \\d\\e Y')
-                            : null
+                    ->tooltip(
+                        fn ($record) =>
+                            $record->birth_date
+                                ? Carbon::parse($record->birth_date)
+                                    ->translatedFormat('l d \\d\\e F \\d\\e Y')
+                                : null
                     )
                     ->sortable(),
 
@@ -78,11 +84,14 @@ class PetsTable
                     ->icon('heroicon-m-scale')
                     ->suffix(' kg')
                     ->numeric(decimalPlaces: 1)
-                    ->color(fn ($state) => match (true) {
-                        $state < 5 => 'success',
-                        $state < 20 => 'warning',
-                        default => 'danger',
-                    })
+                    ->color(
+                        fn ($state) => match (true) {
+                            $state === null => 'gray',
+                            $state < 5 => 'success',
+                            $state < 20 => 'warning',
+                            default => 'danger',
+                        }
+                    )
                     ->sortable(),
 
                 TextColumn::make('user.name')
@@ -91,8 +100,9 @@ class PetsTable
                     ->iconColor('primary')
                     ->weight(FontWeight::Bold)
                     ->color('primary')
-                    ->description(fn ($record) =>
-                        $record->user?->email ?? 'Sin correo registrado'
+                    ->description(
+                        fn ($record) =>
+                            $record->user?->email ?? 'Sin correo registrado'
                     )
                     ->searchable()
                     ->sortable(),
@@ -110,11 +120,14 @@ class PetsTable
                     ->icon('heroicon-m-plus-circle')
                     ->badge()
                     ->color('success')
-                    ->formatStateUsing(fn ($state) =>
-                        Carbon::parse($state)->diffForHumans()
+                    ->formatStateUsing(
+                        fn ($state) =>
+                            Carbon::parse($state)->diffForHumans()
                     )
-                    ->tooltip(fn ($record) =>
-                        Carbon::parse($record->created_at)->format('d/m/Y H:i')
+                    ->tooltip(
+                        fn ($record) =>
+                            Carbon::parse($record->created_at)
+                                ->format('d/m/Y H:i')
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -123,19 +136,20 @@ class PetsTable
                     ->icon('heroicon-m-arrow-path')
                     ->badge()
                     ->color('warning')
-                    ->formatStateUsing(fn ($state) =>
-                        Carbon::parse($state)->diffForHumans()
+                    ->formatStateUsing(
+                        fn ($state) =>
+                            Carbon::parse($state)->diffForHumans()
                     )
-                    ->tooltip(fn ($record) =>
-                        Carbon::parse($record->updated_at)->format('d/m/Y H:i')
+                    ->tooltip(
+                        fn ($record) =>
+                            Carbon::parse($record->updated_at)
+                                ->format('d/m/Y H:i')
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
 
             ])
 
-            ->filters([
-                //
-            ])
+            ->filters([])
 
             ->recordActions([
 
@@ -151,21 +165,18 @@ class PetsTable
                     ->color('warning')
                     ->tooltip('Editar mascota'),
 
-                DeleteAction::make()
-                    ->label('')
-                    ->icon('heroicon-m-trash')
-                    ->color('danger')
-                    ->tooltip('Eliminar mascota'),
-
             ])
 
             ->toolbarActions([
+
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () =>
-                            auth()->user()?->hasRole('admin')
+                        ->visible(
+                            fn () =>
+                                auth()->user()?->hasRole('admin')
                         ),
                 ]),
+
             ])
 
             ->emptyStateIcon('heroicon-o-heart')

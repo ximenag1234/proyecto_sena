@@ -13,22 +13,20 @@ class CreateReminder extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // El administrador puede crear recordatorios
-        // para cualquier mascota.
-        if (auth()->user()->hasRole('admin')) {
-            return $data;
-        }
+        if (! auth()->user()->hasRole('admin')) {
 
-        // Verificar que la mascota pertenezca al usuario.
-        $petBelongsToUser = Pet::query()
-            ->where('id', $data['pet_id'] ?? null)
-            ->where('user_id', auth()->id())
-            ->exists();
+            $petBelongsToUser = Pet::query()
+                ->where('id', $data['pet_id'] ?? null)
+                ->where('user_id', auth()->id())
+                ->exists();
 
-        if (! $petBelongsToUser) {
-            throw ValidationException::withMessages([
-                'pet_id' => 'No puedes crear un recordatorio para una mascota que no te pertenece.',
-            ]);
+            if (! $petBelongsToUser) {
+                throw ValidationException::withMessages([
+                    'pet_id' => 'No puedes crear un recordatorio para una mascota que no te pertenece.',
+                ]);
+            }
+
+            $data['user_id'] = auth()->id();
         }
 
         return $data;

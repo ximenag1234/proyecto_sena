@@ -14,9 +14,9 @@ class BathRoutine extends Model
 
     protected $fillable = [
         'frequency',
-        'age_min',
-        'age_max',
-        'breed_id',
+        'bath_type',
+        'description',
+        'pet_id',
         'user_id',
     ];
 
@@ -25,8 +25,8 @@ class BathRoutine extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function breed()
+    public function pet(): BelongsTo
     {
-        return $this->belongsTo(Breed::class);
+        return $this->belongsTo(Pet::class);
     }
 }

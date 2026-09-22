@@ -122,18 +122,21 @@ class FeedingPlanResource extends Resource
             'food_type',
             'amount',
             'frequency',
+            'pet.name',
             'breed.name',
         ];
     }
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->food_type;
+        return $record->pet?->name
+            ?? $record->food_type;
     }
 
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
+            'Mascota' => $record->pet?->name ?? 'Sin mascota',
             'Raza' => $record->breed?->name ?? 'Sin raza',
             'Cantidad' => $record->amount,
             'Frecuencia' => $record->frequency,

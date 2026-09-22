@@ -22,7 +22,8 @@ class PetResource extends Resource
 {
     protected static ?string $model = Pet::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFaceSmile;
+    protected static string|BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedFaceSmile;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -47,27 +48,19 @@ class PetResource extends Resource
         return PetsTable::configure($table);
     }
 
-    /**
-     * Permite acceder al recurso únicamente a usuarios autenticados.
-     */
     public static function canAccess(): bool
     {
         return auth()->check();
     }
 
-    /**
-     * Admin y user pueden consultar mascotas.
-     */
     public static function canViewAny(): bool
     {
         return auth()->check();
     }
 
     /**
-     * Limita las mascotas que aparecen en las consultas.
-     *
      * ADMIN:
-     * Puede ver todas.
+     * Puede ver todas las mascotas.
      *
      * USER:
      * Solo puede ver sus propias mascotas.
@@ -84,12 +77,12 @@ class PetResource extends Resource
             return $query;
         }
 
-        return $query->where('user_id', auth()->id());
+        return $query->where(
+            'user_id',
+            auth()->id()
+        );
     }
 
-    /**
-     * Protege la visualización de una mascota específica.
-     */
     public static function canView(Model $record): bool
     {
         if (! auth()->check()) {
@@ -103,10 +96,6 @@ class PetResource extends Resource
         return (int) $record->user_id === (int) auth()->id();
     }
 
-    /**
-     * Solo el admin puede editar cualquier mascota.
-     * El user puede editar únicamente sus propias mascotas.
-     */
     public static function canEdit(Model $record): bool
     {
         if (! auth()->check()) {
@@ -120,10 +109,6 @@ class PetResource extends Resource
         return (int) $record->user_id === (int) auth()->id();
     }
 
-    /**
-     * Solo el admin puede eliminar cualquier mascota.
-     * El user puede eliminar únicamente sus propias mascotas.
-     */
     public static function canDelete(Model $record): bool
     {
         if (! auth()->check()) {
@@ -158,7 +143,9 @@ class PetResource extends Resource
             'Dueño' => $record->user?->name ?? 'Sin dueño',
             'Raza' => $record->breed?->name ?? 'Sin raza',
             'Especie' => $record->species ?? 'Sin especie',
-            'Peso' => $record->weight . ' kg',
+            'Peso' => $record->weight
+                ? $record->weight . ' kg'
+                : 'Sin peso',
         ];
     }
 

@@ -32,6 +32,41 @@ class SpeciesResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Especies';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return SpeciesForm::configure($schema);
@@ -47,73 +82,9 @@ class SpeciesResource extends Resource
         return SpeciesTable::configure($table);
     }
 
-    public static function canAccess(): bool
-    {
-        return auth()->check();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return auth()->check();
-    }
-
-    public static function canCreate(): bool
-    {
-        return auth()->check();
-    }
-
-    public static function canView(Model $record): bool
-    {
-        if (! auth()->check()) {
-            return false;
-        }
-
-        if (auth()->user()->hasRole('admin')) {
-            return true;
-        }
-
-        return (int) $record->user_id === (int) auth()->id();
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        if (! auth()->check()) {
-            return false;
-        }
-
-        if (auth()->user()->hasRole('admin')) {
-            return true;
-        }
-
-        return (int) $record->user_id === (int) auth()->id();
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        if (! auth()->check()) {
-            return false;
-        }
-
-        if (auth()->user()->hasRole('admin')) {
-            return true;
-        }
-
-        return (int) $record->user_id === (int) auth()->id();
-    }
-
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery();
-
-        if (! auth()->check()) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        if (auth()->user()->hasRole('admin')) {
-            return $query;
-        }
-
-        return $query->where('user_id', auth()->id());
+        return parent::getEloquentQuery();
     }
 
     public static function getGloballySearchableAttributes(): array

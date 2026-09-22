@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\FeedingPlans\Schemas;
 
 use App\Models\Breed;
+use App\Models\Pet;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -12,12 +14,14 @@ class FeedingPlanForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $esAdmin = auth()->user()?->hasRole('admin');
+
         return $schema
             ->components([
 
-                // ==========================================
+                // =====================================================
                 // INFORMACIÓN DE ALIMENTACIÓN
-                // ==========================================
+                // =====================================================
 
                 Section::make('Plan de alimentación')
                     ->description(
@@ -82,14 +86,21 @@ class FeedingPlanForm
                                 'Indica cuántas veces debe alimentarse la mascota.'
                             ),
 
-                        Select::make('breed_id')
-                            ->label('Raza')
-                            ->placeholder('Selecciona una raza')
-                            ->options(function () {
-                                $query = Breed::query()
+                        // =====================================================
+                        // MASCOTA
+                        // =====================================================
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(function () use ($esAdmin) {
+
+                                $query = Pet::query()
                                     ->orderBy('name');
 
-                                if (! auth()->user()?->hasRole('admin')) {
+                                // Usuario normal:
+                                // solamente sus propias mascotas.
+                                if (! $esAdmin) {
                                     $query->where(
                                         'user_id',
                                         auth()->id()
@@ -98,20 +109,71 @@ class FeedingPlanForm
 
                                 return $query->pluck('name', 'id');
                             })
+                            ->prefixIcon('heroicon-o-face-smile')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->live()
+                            ->required()
+                            ->helperText(
+                                'Selecciona la mascota a la que pertenece este plan.'
+                            )
+                            ->afterStateUpdated(function ($state, callable $set) {
+
+                                if (! $state) {
+                                    $set('breed_id', null);
+                                    return;
+                                }
+
+                                $pet = Pet::find($state);
+
+                                if ($pet) {
+                                    // La raza se obtiene automáticamente
+                                    // desde la mascota.
+                                    $set('breed_id', $pet->breed_id);
+                                }
+                            }),
+
+                        // =====================================================
+                        // RAZA
+                        // SOLO LA VE EL ADMINISTRADOR
+                        // =====================================================
+
+                        Select::make('breed_id')
+                            ->label('Raza')
+                            ->placeholder('Selecciona una raza')
+                            ->options(
+                                fn () => Breed::query()
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                            )
                             ->prefixIcon('heroicon-o-tag')
                             ->searchable()
                             ->preload()
                             ->native(false)
                             ->required()
+                            ->visible(
+                                fn () => auth()->user()?->hasRole('admin')
+                            )
                             ->helperText(
-                                'Selecciona la raza a la que corresponde este plan.'
+                                'La raza se utiliza para relacionar el plan de alimentación.'
+                            ),
+
+                        // =====================================================
+                        // RAZA OCULTA PARA EL USUARIO
+                        // =====================================================
+
+                        Hidden::make('breed_id')
+                            ->visible(
+                                fn () => ! auth()->user()?->hasRole('admin')
                             ),
 
                     ]),
 
-                // ==========================================
+                // =====================================================
                 // RANGO DE EDAD
-                // ==========================================
+                // SOLO ADMINISTRADOR
+                // =====================================================
 
                 Section::make('Rango de edad')
                     ->description(
@@ -120,6 +182,9 @@ class FeedingPlanForm
                     ->icon('heroicon-o-calendar')
                     ->iconColor('warning')
                     ->columns(2)
+                    ->visible(
+                        fn () => auth()->user()?->hasRole('admin')
+                    )
                     ->schema([
 
                         TextInput::make('age_min')
@@ -148,46 +213,11 @@ class FeedingPlanForm
 
                     ]),
 
-                // ==========================================
+                // =====================================================
                 // RANGO DE PESO
-                // ==========================================
+                // =====================================================
 
-                Section::make('Rango de peso')
-                    ->description(
-                        'Define el rango de peso de las mascotas para este plan alimenticio.'
-                    )
-                    ->icon('heroicon-o-scale')
-                    ->iconColor('primary')
-                    ->columns(2)
-                    ->schema([
-
-                        TextInput::make('weight_min')
-                            ->label('Peso mínimo')
-                            ->placeholder('Ej: 2.5')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(500)
-                            ->step(0.1)
-                            ->prefixIcon('heroicon-o-arrow-down')
-                            ->suffix('kg')
-                            ->helperText(
-                                'Peso mínimo recomendado para este plan.'
-                            ),
-
-                        TextInput::make('weight_max')
-                            ->label('Peso máximo')
-                            ->placeholder('Ej: 15')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(500)
-                            ->step(0.1)
-                            ->prefixIcon('heroicon-o-arrow-up')
-                            ->suffix('kg')
-                            ->helperText(
-                                'Peso máximo recomendado para este plan.'
-                            ),
-
-                    ]),
+                
             ]);
     }
 }

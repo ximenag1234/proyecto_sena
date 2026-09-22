@@ -8,6 +8,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class PetForm
@@ -22,7 +23,9 @@ class PetForm
                 // ==========================================
 
                 Section::make('Información de la mascota')
-                    ->description('Registra los datos principales de tu mascota.')
+                    ->description(
+                        'Registra los datos principales de tu mascota.'
+                    )
                     ->icon('heroicon-o-heart')
                     ->iconColor('danger')
                     ->columns(2)
@@ -50,6 +53,7 @@ class PetForm
                             ->prefixIcon('heroicon-o-sparkles')
                             ->searchable()
                             ->native(false)
+                            ->live()
                             ->required(),
 
                         DatePicker::make('birth_date')
@@ -91,6 +95,10 @@ class PetForm
                     ->columns(2)
                     ->schema([
 
+                        // ==========================================
+                        // PROPIETARIO
+                        // ==========================================
+
                         Select::make('user_id')
                             ->label('Propietario')
                             ->placeholder('Selecciona el propietario')
@@ -114,29 +122,104 @@ class PetForm
                                 'Solo el administrador puede seleccionar el propietario.'
                             ),
 
+                        // ==========================================
+                        // RAZA
+                        // ==========================================
+
                         Select::make('breed_id')
                             ->label('Raza')
-                            ->placeholder('Selecciona la raza')
-                            ->options(function () {
-                                $query = Breed::query()
-                                    ->orderBy('name');
+                            ->placeholder(
+                                'Primero selecciona una especie'
+                            )
 
-                                if (! auth()->user()?->hasRole('admin')) {
-                                    $query->where(
-                                        'user_id',
-                                        auth()->id()
-                                    );
+                            ->options(function (Get $get) {
+
+                                $species = $get('species');
+
+                                // Si todavía no se seleccionó especie,
+                                // no mostramos razas.
+                                if (! $species) {
+                                    return [];
                                 }
 
-                                return $query->pluck('name', 'id');
+                                // Relación entre el valor del formulario
+                                // y el valor guardado en Breed.
+                                $speciesMap = [
+                                    'perro' => 'Perro',
+                                    'gato' => 'Gato',
+                                    'ave' => 'Ave',
+                                    'conejo' => 'Conejo',
+                                    'hamster' => 'Hámster',
+                                    'otro' => 'Otro',
+                                ];
+
+                                $speciesName = $speciesMap[$species] ?? 'Otro';
+
+                                return Breed::query()
+                                    ->where('species', $speciesName)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
                             })
+
                             ->prefixIcon('heroicon-o-tag')
                             ->searchable()
                             ->preload()
                             ->native(false)
                             ->required()
+
+                            // Desactivada hasta seleccionar especie.
+                            ->disabled(
+                                fn (Get $get) => ! $get('species')
+                            )
+
                             ->helperText(
-                                'Solo podrás seleccionar las razas disponibles para ti.'
+                                'Selecciona la especie para ver las razas disponibles.'
+                            )
+
+                            // ==========================================
+                            // CREAR OTRA RAZA
+                            // ==========================================
+
+                            ->createOptionForm([
+
+                                TextInput::make('name')
+                                    ->label('Nombre de la nueva raza')
+                                    ->placeholder(
+                                        'Ej: Border Collie'
+                                    )
+                                    ->required()
+                                    ->maxLength(100),
+
+                            ])
+
+                            ->createOptionUsing(
+                                function (array $data, Get $get) {
+
+                                    $species = $get('species');
+
+                                    $speciesMap = [
+                                        'perro' => 'Perro',
+                                        'gato' => 'Gato',
+                                        'ave' => 'Ave',
+                                        'conejo' => 'Conejo',
+                                        'hamster' => 'Hámster',
+                                        'otro' => 'Otro',
+                                    ];
+
+                                    $speciesName =
+                                        $speciesMap[$species] ?? 'Otro';
+
+                                    $breed = Breed::create([
+                                        'name' => $data['name'],
+                                        'species' => $speciesName,
+                                        'size' => 'No especificado',
+                                        'description' =>
+                                            'Raza agregada por el usuario.',
+                                    ]);
+
+                                    return $breed->getKey();
+                                }
                             ),
 
                     ]),

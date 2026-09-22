@@ -22,6 +22,7 @@ class FeedingPlan extends Model
         'weight_max',
         'breed_id',
         'user_id',
+        'pet_id',
     ];
 
     public function user(): BelongsTo
@@ -29,8 +30,13 @@ class FeedingPlan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function breed()
+    public function breed(): BelongsTo
     {
         return $this->belongsTo(Breed::class);
+    }
+
+    public function pet(): BelongsTo
+    {
+        return $this->belongsTo(Pet::class);
     }
 }

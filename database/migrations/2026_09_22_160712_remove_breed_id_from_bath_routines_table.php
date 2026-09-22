@@ -26,10 +26,10 @@ class BathRoutinesTable
                 // ==========================================
 
                 TextColumn::make('pet.name')
-                    ->label('🐾 Mascota')
+                    ->label('🐶 Mascota')
                     ->badge()
                     ->icon('heroicon-m-face-smile')
-                    ->iconColor('danger')
+                    ->iconColor('primary')
                     ->color('primary')
                     ->weight(FontWeight::Bold)
                     ->description('Mascota de la rutina')
@@ -45,9 +45,14 @@ class BathRoutinesTable
                     ->badge()
                     ->weight(FontWeight::Bold)
                     ->icon('heroicon-m-arrow-path')
-                    ->color('warning')
-                    ->searchable()
-                    ->sortable(),
+                    ->color(fn ($state) => match (mb_strtolower($state)) {
+                        'diario', 'cada día' => 'danger',
+                        'semanal', 'cada semana' => 'success',
+                        'quincenal', 'cada 15 días' => 'warning',
+                        'mensual', 'cada mes' => 'info',
+                        default => 'gray',
+                    })
+                    ->searchable(),
 
                 // ==========================================
                 // TIPO DE BAÑO
@@ -56,17 +61,10 @@ class BathRoutinesTable
                 TextColumn::make('bath_type')
                     ->label('🧼 Tipo de baño')
                     ->badge()
-                    ->icon('heroicon-m-beaker')
-                    ->color(fn ($state) => match ($state) {
-                        'Baño completo' => 'info',
-                        'Baño medicado' => 'danger',
-                        'Baño antipulgas' => 'warning',
-                        'Baño en seco' => 'success',
-                        'Baño de limpieza' => 'primary',
-                        default => 'gray',
-                    })
-                    ->searchable()
-                    ->sortable(),
+                    ->icon('heroicon-m-sparkles')
+                    ->color('info')
+                    ->weight(FontWeight::Bold)
+                    ->searchable(),
 
                 // ==========================================
                 // OBSERVACIONES
@@ -75,7 +73,7 @@ class BathRoutinesTable
                 TextColumn::make('description')
                     ->label('📝 Observaciones')
                     ->placeholder('Sin observaciones')
-                    ->limit(50)
+                    ->limit(40)
                     ->wrap()
                     ->searchable(),
 
@@ -84,9 +82,9 @@ class BathRoutinesTable
                 // ==========================================
 
                 TextColumn::make('created_at')
-                    ->label('➕ Creado')
-                    ->icon('heroicon-m-plus-circle')
+                    ->label('Creado')
                     ->badge()
+                    ->icon('heroicon-m-plus-circle')
                     ->color('success')
                     ->formatStateUsing(
                         fn ($state) => Carbon::parse($state)->diffForHumans()
@@ -103,9 +101,9 @@ class BathRoutinesTable
                 // ==========================================
 
                 TextColumn::make('updated_at')
-                    ->label('🔄 Actualizado')
-                    ->icon('heroicon-m-arrow-path')
+                    ->label('Actualizado')
                     ->badge()
+                    ->icon('heroicon-m-arrow-path')
                     ->color('warning')
                     ->formatStateUsing(
                         fn ($state) => Carbon::parse($state)->diffForHumans()
@@ -118,10 +116,6 @@ class BathRoutinesTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
             ])
-
-            // ==========================================
-            // FILTROS
-            // ==========================================
 
             ->filters([
                 //
@@ -164,12 +158,8 @@ class BathRoutinesTable
             ->emptyStateIcon('heroicon-o-sparkles')
             ->emptyStateHeading('No hay rutinas de baño')
             ->emptyStateDescription(
-                'Las rutinas de baño registradas aparecerán aquí.'
+                'Las rutinas de baño que registres aparecerán aquí.'
             )
-
-            // ==========================================
-            // PAGINACIÓN
-            // ==========================================
 
             ->paginated([10, 25, 50]);
     }

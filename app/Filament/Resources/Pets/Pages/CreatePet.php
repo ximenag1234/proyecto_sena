@@ -11,7 +11,6 @@ class CreatePet extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // El usuario normal solo puede crear mascotas para sí mismo.
         if (! auth()->user()->hasRole('admin')) {
             $data['user_id'] = auth()->id();
         }

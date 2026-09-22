@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\BathRoutines\Schemas;
 
-use App\Models\Breed;
+use App\Models\Pet;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -16,17 +16,50 @@ class BathRoutineForm
             ->components([
 
                 // ==========================================
-                // INFORMACIÓN DE LA RUTINA DE BAÑO
+                // INFORMACIÓN DE LA RUTINA
                 // ==========================================
 
                 Section::make('Rutina de baño')
                     ->description(
-                        'Configura la frecuencia de baño recomendada según la raza y la edad.'
+                        'Configura la rutina de baño para una de tus mascotas.'
                     )
                     ->icon('heroicon-o-sparkles')
                     ->iconColor('info')
                     ->columns(2)
                     ->schema([
+
+                        // ==========================================
+                        // MASCOTA
+                        // ==========================================
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(function () {
+
+                                if (auth()->user()?->hasRole('admin')) {
+                                    return Pet::query()
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id');
+                                }
+
+                                return Pet::query()
+                                    ->where('user_id', auth()->id())
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id');
+                            })
+                            ->prefixIcon('heroicon-o-face-smile')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
+                            ->helperText(
+                                'Selecciona la mascota para la que deseas registrar esta rutina.'
+                            ),
+
+                        // ==========================================
+                        // FRECUENCIA
+                        // ==========================================
 
                         TextInput::make('frequency')
                             ->label('Frecuencia')
@@ -35,71 +68,46 @@ class BathRoutineForm
                             ->required()
                             ->maxLength(100)
                             ->helperText(
-                                'Indica cada cuánto se recomienda realizar el baño.'
+                                'Indica cada cuánto debe realizarse el baño.'
                             ),
 
-                        Select::make('breed_id')
-                            ->label('Raza')
-                            ->placeholder('Selecciona una raza')
-                            ->options(function () {
-                                $query = Breed::query()
-                                    ->orderBy('name');
+                        // ==========================================
+                        // TIPO DE BAÑO
+                        // ==========================================
 
-                                if (! auth()->user()?->hasRole('admin')) {
-                                    $query->where(
-                                        'user_id',
-                                        auth()->id()
-                                    );
-                                }
-
-                                return $query->pluck('name', 'id');
-                            })
-                            ->prefixIcon('heroicon-o-tag')
+                        Select::make('bath_type')
+                            ->label('Tipo de baño')
+                            ->placeholder('Selecciona el tipo de baño')
+                            ->options([
+                                'Baño completo' => '🛁 Baño completo',
+                                'Baño medicado' => '💊 Baño medicado',
+                                'Baño antipulgas' => '🐜 Baño antipulgas',
+                                'Baño en seco' => '✨ Baño en seco',
+                                'Baño de limpieza' => '🧼 Baño de limpieza',
+                                'Otro' => '🐾 Otro',
+                            ])
+                            ->prefixIcon('heroicon-o-beaker')
                             ->searchable()
-                            ->preload()
                             ->native(false)
                             ->required()
                             ->helperText(
-                                'Selecciona la raza a la que corresponde esta rutina.'
+                                'Selecciona el tipo de baño que necesita la mascota.'
                             ),
 
-                    ]),
+                        // ==========================================
+                        // OBSERVACIONES
+                        // ==========================================
 
-                // ==========================================
-                // RANGO DE EDAD
-                // ==========================================
-
-                Section::make('Rango de edad')
-                    ->description(
-                        'Define el rango de edad para el que aplica esta rutina de baño.'
-                    )
-                    ->icon('heroicon-o-calendar')
-                    ->iconColor('primary')
-                    ->columns(2)
-                    ->schema([
-
-                        TextInput::make('age_min')
-                            ->label('Edad mínima')
-                            ->placeholder('Ej: 1')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->suffix('años')
-                            ->prefixIcon('heroicon-o-chevron-double-right')
+                        TextInput::make('description')
+                            ->label('Observaciones')
+                            ->placeholder(
+                                'Ej: Usar champú para piel sensible'
+                            )
+                            ->prefixIcon('heroicon-o-document-text')
+                            ->maxLength(255)
+                            ->columnSpanFull()
                             ->helperText(
-                                'Edad mínima recomendada para esta rutina.'
-                            ),
-
-                        TextInput::make('age_max')
-                            ->label('Edad máxima')
-                            ->placeholder('Ej: 10')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->suffix('años')
-                            ->prefixIcon('heroicon-o-chevron-double-right')
-                            ->helperText(
-                                'Edad máxima recomendada para esta rutina.'
+                                'Puedes agregar cuidados o recomendaciones especiales.'
                             ),
 
                     ]),

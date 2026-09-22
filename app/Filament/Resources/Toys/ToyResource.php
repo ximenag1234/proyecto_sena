@@ -152,3 +152,4 @@ class ToyResource extends Resource
         ];
     }
 }
+
