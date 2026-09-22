@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
-use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class UsersTable
@@ -16,179 +15,97 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('created_at', 'desc')
-            ->striped()
-
             ->columns([
 
-                /*
-                |--------------------------------------------------------------------------
-                | Usuario
-                |--------------------------------------------------------------------------
-                */
                 TextColumn::make('name')
-                    ->label('👤 Usuario')
-                    ->weight(FontWeight::Bold)
-                    ->icon('heroicon-m-user')
-                    ->iconColor('primary')
-                    ->color('primary')
-                    ->description('Nombre del usuario')
+                    ->label('Usuario')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold')
+                    ->description(fn ($record) => $record->email)
+                    ->icon('heroicon-o-user'),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Correo electrónico
-                |--------------------------------------------------------------------------
-                */
-                TextColumn::make('email')
-                    ->label('📧 Correo electrónico')
-                    ->badge()
-                    ->icon('heroicon-m-envelope')
-                    ->color('info')
-                    ->copyable()
-                    ->copyMessage('Correo copiado')
-                    ->copyMessageDuration(1500)
-                    ->searchable()
-                    ->sortable(),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Roles - Filament Shield / Spatie Permission
-                |--------------------------------------------------------------------------
-                */
                 TextColumn::make('roles.name')
-                    ->label('🛡️ Roles')
+                    ->label('Rol')
                     ->badge()
-                    ->icon('heroicon-m-shield-check')
-                    ->separator(',')
-                    ->color(fn (string $state): string => match ($state) {
-                        'Super Admin' => 'danger',
-                        'Admin' => 'warning',
-                        'Administrador' => 'warning',
-                        'Usuario' => 'info',
-                        default => 'gray',
-                    })
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->separator(', ')
+                    ->color(fn (string $state): string => match ($state) {
+                        'super_admin' => 'danger',
+                        'admin' => 'warning',
+                        'user' => 'success',
+                        default => 'gray',
+                    }),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Estado del correo
-                |--------------------------------------------------------------------------
-                */
-                TextColumn::make('email_verified_at')
-                    ->label('✅ Estado del correo')
-                    ->badge()
-                    ->icon(fn ($state) => $state
-                        ? 'heroicon-m-check-circle'
-                        : 'heroicon-m-x-circle')
-                    ->color(fn ($state) => $state
-                        ? 'success'
-                        : 'danger')
-                    ->formatStateUsing(fn ($state) => $state
-                        ? 'Verificado'
-                        : 'Sin verificar')
-                    ->tooltip(fn ($record) => $record->email_verified_at
-                        ? Carbon::parse($record->email_verified_at)->format('d/m/Y H:i')
-                        : 'Este usuario aún no ha verificado su correo')
-                    ->sortable(),
+                IconColumn::make('email_verified_at')
+                    ->label('Correo')
+                    ->boolean()
+                    ->getStateUsing(
+                        fn ($record) => ! is_null($record->email_verified_at)
+                    )
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->tooltip(
+                        fn ($record) => $record->email_verified_at
+                            ? 'Correo verificado'
+                            : 'Correo no verificado'
+                    ),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Fecha de creación
-                |--------------------------------------------------------------------------
-                */
                 TextColumn::make('created_at')
-                    ->label('➕ Creado')
-                    ->icon('heroicon-m-plus-circle')
-                    ->badge()
-                    ->color('success')
-                    ->formatStateUsing(fn ($state) =>
-                        Carbon::parse($state)->diffForHumans()
-                    )
-                    ->tooltip(fn ($record) =>
-                        Carbon::parse($record->created_at)->format('d/m/Y H:i')
-                    )
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Registrado')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Fecha de actualización
-                |--------------------------------------------------------------------------
-                */
                 TextColumn::make('updated_at')
-                    ->label('🔄 Actualizado')
-                    ->icon('heroicon-m-arrow-path')
-                    ->badge()
-                    ->color('warning')
-                    ->formatStateUsing(fn ($state) =>
-                        Carbon::parse($state)->diffForHumans()
-                    )
-                    ->tooltip(fn ($record) =>
-                        Carbon::parse($record->updated_at)->format('d/m/Y H:i')
-                    )
+                    ->label('Última actualización')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | Filtros
-            |--------------------------------------------------------------------------
-            */
             ->filters([
-                //
+
+                SelectFilter::make('roles')
+                    ->label('Filtrar por rol')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload(),
+
+                SelectFilter::make('email_verified_at')
+                    ->label('Estado del correo')
+                    ->options([
+                        'verified' => 'Verificado',
+                        'unverified' => 'No verificado',
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['value'] === 'verified') {
+                            $query->whereNotNull('email_verified_at');
+                        }
+
+                        if ($data['value'] === 'unverified') {
+                            $query->whereNull('email_verified_at');
+                        }
+                    }),
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | Acciones por registro
-            |--------------------------------------------------------------------------
-            */
             ->recordActions([
-
-                ViewAction::make()
-                    ->label('')
-                    ->icon('heroicon-m-eye')
-                    ->color('info')
-                    ->tooltip('Ver usuario'),
-
                 EditAction::make()
-                    ->label('')
-                    ->icon('heroicon-m-pencil-square')
-                    ->color('warning')
-                    ->tooltip('Editar usuario'),
-
+                    ->label('Editar')
+                    ->icon('heroicon-o-pencil-square'),
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | Acciones masivas
-            |--------------------------------------------------------------------------
-            */
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Eliminar seleccionados')
+                        ->requiresConfirmation(),
                 ]),
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | Estado vacío
-            |--------------------------------------------------------------------------
-            */
-            ->emptyStateIcon('heroicon-o-users')
-            ->emptyStateHeading('No hay usuarios registrados')
-            ->emptyStateDescription(
-                'Cuando registres un usuario aparecerá aquí.'
-            )
-
-            /*
-            |--------------------------------------------------------------------------
-            | Paginación
-            |--------------------------------------------------------------------------
-            */
-            ->paginated([10, 25, 50]);
+            ->defaultSort('created_at', 'desc');
     }
 }

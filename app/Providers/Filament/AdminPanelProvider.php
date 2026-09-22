@@ -8,6 +8,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -34,6 +35,15 @@ class AdminPanelProvider extends PanelProvider
 
             // Registro de nuevos usuarios
             ->registration(Register::class)
+
+            // Información del usuario actual
+            ->userMenuItems([
+                'current-role' => MenuItem::make()
+                    ->label(fn (): string => 'Rol: ' . (
+                        auth()->user()?->getRoleNames()->implode(', ') ?? 'Sin rol'
+                    ))
+                    ->icon('heroicon-o-shield-check'),
+            ])
 
             ->plugin(
                 FilamentShieldPlugin::make()

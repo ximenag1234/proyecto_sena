@@ -10,16 +10,6 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
-    public function mount(): void
-    {
-        abort_unless(
-            auth()->check() && auth()->user()->hasRole('admin'),
-            403
-        );
-
-        parent::mount();
-    }
-
     protected function getHeaderActions(): array
     {
         return [

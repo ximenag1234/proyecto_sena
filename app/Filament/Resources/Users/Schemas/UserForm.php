@@ -6,6 +6,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 
 class UserForm
@@ -15,108 +16,80 @@ class UserForm
         return $schema
             ->components([
 
-                // ==========================================
-                // INFORMACIÓN PERSONAL
-                // ==========================================
-
                 Section::make('Información del usuario')
-                    ->description(
-                        'Registra los datos principales de la cuenta del usuario.'
-                    )
+                    ->description('Datos básicos de la cuenta del usuario.')
                     ->icon('heroicon-o-user')
-                    ->iconColor('primary')
-                    ->columns(2)
                     ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nombre completo')
+                                    ->placeholder('Ej. Juan Pérez')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->autocomplete('name'),
 
-                        TextInput::make('name')
-                            ->label('Nombre completo')
-                            ->placeholder('Ej: Juan Pérez')
-                            ->prefixIcon('heroicon-o-user')
-                            ->required()
-                            ->maxLength(150)
-                            ->autofocus()
-                            ->helperText(
-                                'Escribe el nombre completo del usuario.'
-                            ),
-
-                        TextInput::make('email')
-                            ->label('Correo electrónico')
-                            ->placeholder('Ej: usuario@correo.com')
-                            ->prefixIcon('heroicon-o-envelope')
-                            ->email()
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText(
-                                'Utiliza una dirección de correo válida.'
-                            ),
-
-                        // ==========================================
-                        // ROLES
-                        // ==========================================
-
-                        Select::make('roles')
-                            ->label('🛡️ Roles')
-                            ->placeholder('Selecciona uno o varios roles')
-                            ->prefixIcon('heroicon-o-shield-check')
-                            ->relationship(
-                                name: 'roles',
-                                titleAttribute: 'name',
-                            )
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->native(false)
-                            ->required()
-                            ->helperText(
-                                'Selecciona uno o varios roles para este usuario.'
-                            )
-                            ->columnSpanFull(),
-
+                                TextInput::make('email')
+                                    ->label('Correo electrónico')
+                                    ->placeholder('usuario@ejemplo.com')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true)
+                                    ->autocomplete('email'),
+                            ]),
                     ]),
 
-                // ==========================================
-                // SEGURIDAD DE LA CUENTA
-                // ==========================================
-
-                Section::make('Seguridad de la cuenta')
-                    ->description(
-                        'Administra la contraseña y el estado de verificación del correo.'
-                    )
-                    ->icon('heroicon-o-lock-closed')
-                    ->iconColor('warning')
-                    ->columns(2)
+                Section::make('Acceso y permisos')
+                    ->description('Configura el rol y las credenciales de acceso.')
+                    ->icon('heroicon-o-shield-check')
                     ->schema([
+                        Grid::make(2)
+                            ->schema([
 
-                        TextInput::make('password')
-                            ->label('Contraseña')
-                            ->placeholder('Ingresa una contraseña segura')
-                            ->prefixIcon('heroicon-o-lock-closed')
-                            ->password()
-                            ->revealable()
-                            ->minLength(8)
-                            ->required(
-                                fn (string $operation): bool =>
-                                    $operation === 'create'
-                            )
-                            ->dehydrated(
-                                fn (?string $state): bool =>
-                                    filled($state)
-                            )
-                            ->helperText(
-                                'Mínimo 8 caracteres. Déjalo vacío al editar si no deseas cambiarla.'
-                            ),
+                                Select::make('roles')
+                                    ->label('Rol')
+                                    ->relationship('roles', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->placeholder('Selecciona un rol')
+                                    ->helperText('Puedes asignar uno o varios roles al usuario.'),
 
-                        DateTimePicker::make('email_verified_at')
-                            ->label('Correo verificado el')
-                            ->placeholder('Selecciona fecha y hora')
-                            ->prefixIcon('heroicon-o-check-badge')
-                            ->native(false)
-                            ->seconds(false)
-                            ->displayFormat('d/m/Y H:i')
-                            ->helperText(
-                                'Indica cuándo se verificó el correo electrónico.'
-                            ),
+                                DateTimePicker::make('email_verified_at')
+                                    ->label('Correo verificado')
+                                    ->placeholder('Selecciona una fecha')
+                                    ->native(false)
+                                    ->seconds(false),
+                            ]),
 
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('password')
+                                    ->label('Contraseña')
+                                    ->password()
+                                    ->revealable()
+                                    ->autocomplete('new-password')
+                                    ->minLength(8)
+                                    ->dehydrated(fn ($state) => filled($state))
+                                    ->required(fn (string $operation): bool => $operation === 'create')
+                                    ->helperText(
+                                        fn (string $operation): ?string =>
+                                            $operation === 'edit'
+                                                ? 'Déjalo vacío si no deseas cambiar la contraseña.'
+                                                : 'La contraseña debe tener al menos 8 caracteres.'
+                                    ),
+
+                                TextInput::make('password_confirmation')
+                                    ->label('Confirmar contraseña')
+                                    ->password()
+                                    ->revealable()
+                                    ->same('password')
+                                    ->dehydrated(false)
+                                    ->required(fn (string $operation): bool => $operation === 'create')
+                                    ->placeholder('Repite la contraseña'),
+                            ]),
                     ]),
             ]);
     }
