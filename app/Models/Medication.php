@@ -16,11 +16,17 @@ class Medication extends Model
         'name',
         'description',
         'user_id',
+        'pet_id',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pet(): BelongsTo
+    {
+        return $this->belongsTo(Pet::class);
     }
 
     public function doses()

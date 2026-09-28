@@ -58,13 +58,6 @@ class PetResource extends Resource
         return auth()->check();
     }
 
-    /**
-     * ADMIN:
-     * Puede ver todas las mascotas.
-     *
-     * USER:
-     * Solo puede ver sus propias mascotas.
-     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -73,14 +66,11 @@ class PetResource extends Resource
             return $query->whereRaw('1 = 0');
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return $query;
         }
 
-        return $query->where(
-            'user_id',
-            auth()->id()
-        );
+        return $query->where('user_id', auth()->id());
     }
 
     public static function canView(Model $record): bool
@@ -89,7 +79,7 @@ class PetResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -102,7 +92,7 @@ class PetResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -115,7 +105,7 @@ class PetResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 

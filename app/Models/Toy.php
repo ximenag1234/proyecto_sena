@@ -17,11 +17,17 @@ class Toy extends Model
         'type',
         'description',
         'user_id',
+        'pet_id',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pet(): BelongsTo
+    {
+        return $this->belongsTo(Pet::class);
     }
 
     public function breeds()

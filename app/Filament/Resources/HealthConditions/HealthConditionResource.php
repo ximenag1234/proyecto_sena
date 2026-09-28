@@ -22,7 +22,8 @@ class HealthConditionResource extends Resource
 {
     protected static ?string $model = HealthCondition::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
+    protected static string|BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedHeart;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -68,7 +69,7 @@ class HealthConditionResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -81,7 +82,7 @@ class HealthConditionResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -94,7 +95,7 @@ class HealthConditionResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -109,7 +110,7 @@ class HealthConditionResource extends Resource
             return $query->whereRaw('1 = 0');
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return $query;
         }
 

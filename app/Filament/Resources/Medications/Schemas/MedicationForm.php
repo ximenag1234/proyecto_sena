@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Medications\Schemas;
 
+use App\Models\Pet;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
@@ -14,28 +16,49 @@ class MedicationForm
         return $schema
             ->components([
 
-                // ==========================================
-                // INFORMACIÓN DEL MEDICAMENTO
-                // ==========================================
-
                 Section::make('Información del medicamento')
                     ->description(
-                        'Registra un medicamento y agrega información importante sobre su uso.'
+                        'Registra un medicamento y asígnalo a una mascota.'
                     )
                     ->icon('heroicon-o-beaker')
                     ->iconColor('warning')
-                    ->columns(1)
+                    ->columns(2)
                     ->schema([
 
                         TextInput::make('name')
                             ->label('Nombre del medicamento')
-                            ->placeholder('Ej: Amoxicilina, Ibuprofeno, Antibiótico...')
+                            ->placeholder(
+                                'Ej: Amoxicilina, medicamento veterinario...'
+                            )
                             ->prefixIcon('heroicon-o-beaker')
                             ->required()
                             ->maxLength(150)
-                            ->autofocus()
+                            ->autofocus(),
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(function () {
+
+                                $query = Pet::query()
+                                    ->orderBy('name');
+
+                                if (! auth()->user()?->hasRole('admin')) {
+                                    $query->where(
+                                        'user_id',
+                                        auth()->id()
+                                    );
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
+                            ->prefixIcon('heroicon-o-heart')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
                             ->helperText(
-                                'Escribe el nombre del medicamento.'
+                                'Selecciona la mascota a la que pertenece este medicamento.'
                             ),
 
                         Textarea::make('description')
@@ -45,11 +68,7 @@ class MedicationForm
                             )
                             ->rows(7)
                             ->maxLength(2000)
-                            ->columnSpanFull()
-                            ->helperText(
-                                'Agrega información relevante sobre este medicamento.'
-                            ),
-
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

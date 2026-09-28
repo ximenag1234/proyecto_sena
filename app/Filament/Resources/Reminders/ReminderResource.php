@@ -22,7 +22,8 @@ class ReminderResource extends Resource
 {
     protected static ?string $model = Reminder::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBellAlert;
+    protected static string|BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedBellAlert;
 
     protected static ?string $recordTitleAttribute = 'type';
 
@@ -47,9 +48,6 @@ class ReminderResource extends Resource
         return RemindersTable::configure($table);
     }
 
-    /**
-     * Admin y user pueden consultar recordatorios.
-     */
     public static function canAccess(): bool
     {
         return auth()->check();
@@ -60,15 +58,6 @@ class ReminderResource extends Resource
         return auth()->check();
     }
 
-    /**
-     * Filtra los recordatorios según el propietario de la mascota.
-     *
-     * ADMIN:
-     * Puede ver todos.
-     *
-     * USER:
-     * Solo puede ver recordatorios de sus propias mascotas.
-     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -77,7 +66,7 @@ class ReminderResource extends Resource
             return $query->whereRaw('1 = 0');
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return $query;
         }
 
@@ -86,48 +75,39 @@ class ReminderResource extends Resource
         });
     }
 
-    /**
-     * Protege la visualización de un recordatorio específico.
-     */
     public static function canView(Model $record): bool
     {
         if (! auth()->check()) {
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
         return (int) $record->pet?->user_id === (int) auth()->id();
     }
 
-    /**
-     * Protege la edición.
-     */
     public static function canEdit(Model $record): bool
     {
         if (! auth()->check()) {
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
         return (int) $record->pet?->user_id === (int) auth()->id();
     }
 
-    /**
-     * Protege la eliminación.
-     */
     public static function canDelete(Model $record): bool
     {
         if (! auth()->check()) {
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 

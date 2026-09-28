@@ -11,14 +11,31 @@ class EditHealthCondition extends EditRecord
 {
     protected static string $resource = HealthConditionResource::class;
 
-    public function mount(int|string $record): void
-    {
-        abort_unless(
-            auth()->check() && auth()->user()->hasRole('admin'),
-            403
-        );
+    protected ?int $petId = null;
 
-        parent::mount($record);
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['pet_id'] = $this->record->pets()->first()?->id;
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $this->petId = $data['pet_id'] ?? null;
+
+        unset($data['pet_id']);
+
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->petId) {
+            $this->record->pets()->sync([
+                $this->petId,
+            ]);
+        }
     }
 
     protected function getHeaderActions(): array

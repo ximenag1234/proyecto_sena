@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\HealthConditions\Schemas;
 
+use App\Models\Pet;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
@@ -14,44 +16,60 @@ class HealthConditionForm
         return $schema
             ->components([
 
-                // ==========================================
-                // INFORMACIÓN DE LA CONDICIÓN
-                // ==========================================
-
-                Section::make('Información de la condición de salud')
+                Section::make('Información de la condición')
                     ->description(
-                        'Registra una condición de salud y proporciona información relevante sobre ella.'
+                        'Registra una condición de salud y asígnala a una mascota.'
                     )
                     ->icon('heroicon-o-heart')
                     ->iconColor('danger')
-                    ->columns(1)
+                    ->columns(2)
                     ->schema([
 
                         TextInput::make('name')
                             ->label('Nombre de la condición')
-                            ->placeholder('Ej: Alergia, Otitis, Dermatitis...')
+                            ->placeholder(
+                                'Ej: Otitis, alergia, dermatitis...'
+                            )
                             ->prefixIcon('heroicon-o-heart')
                             ->required()
                             ->maxLength(150)
-                            ->autofocus()
+                            ->autofocus(),
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(function () {
+
+                                $query = Pet::query()
+                                    ->orderBy('name');
+
+                                if (! auth()->user()?->hasRole('admin')) {
+                                    $query->where(
+                                        'user_id',
+                                        auth()->id()
+                                    );
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
+                            ->prefixIcon('heroicon-o-heart')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->required()
                             ->helperText(
-                                'Escribe el nombre de la condición de salud.'
+                                'Selecciona la mascota que presenta esta condición.'
                             ),
 
                         Textarea::make('description')
                             ->label('Descripción')
                             ->placeholder(
-                                'Describe los síntomas, características o información importante de esta condición...'
+                                'Describe la condición de salud...'
                             )
                             ->rows(6)
                             ->maxLength(2000)
-                            ->columnSpanFull()
-                            ->helperText(
-                                'Agrega información útil para identificar y comprender esta condición.'
-                            ),
-
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
 }
-

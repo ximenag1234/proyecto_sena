@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Toys\Schemas;
 
+use App\Models\Pet;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -17,7 +18,7 @@ class ToyForm
 
                 Section::make('Información del juguete')
                     ->description(
-                        'Registra un juguete y especifica su categoría y características.'
+                        'Registra un juguete y asígnalo a una mascota.'
                     )
                     ->icon('heroicon-o-sparkles')
                     ->iconColor('warning')
@@ -30,10 +31,7 @@ class ToyForm
                             ->prefixIcon('heroicon-o-tag')
                             ->required()
                             ->maxLength(150)
-                            ->autofocus()
-                            ->helperText(
-                                'Escribe el nombre del juguete.'
-                            ),
+                            ->autofocus(),
 
                         Select::make('type')
                             ->label('Tipo de juguete')
@@ -64,15 +62,38 @@ class ToyForm
                             ->prefixIcon('heroicon-o-sparkles')
                             ->searchable()
                             ->native(false)
+                            ->required(),
+
+                        Select::make('pet_id')
+                            ->label('Mascota')
+                            ->placeholder('Selecciona una mascota')
+                            ->options(function () {
+
+                                $query = Pet::query()
+                                    ->orderBy('name');
+
+                                if (! auth()->user()?->hasRole('admin')) {
+                                    $query->where(
+                                        'user_id',
+                                        auth()->id()
+                                    );
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
+                            ->prefixIcon('heroicon-o-heart')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
                             ->required()
                             ->helperText(
-                                'Selecciona la categoría que mejor describe el juguete.'
+                                'Selecciona la mascota a la que pertenece este juguete.'
                             ),
                     ]),
 
                 Section::make('Descripción del juguete')
                     ->description(
-                        'Agrega información sobre el uso, características y beneficios del juguete.'
+                        'Agrega información sobre el uso y características.'
                     )
                     ->icon('heroicon-o-document-text')
                     ->iconColor('success')
@@ -81,16 +102,12 @@ class ToyForm
                         Textarea::make('description')
                             ->label('Descripción')
                             ->placeholder(
-                                'Describe el juguete, su funcionamiento, materiales, beneficios, recomendaciones de uso, etc.'
+                                'Describe el juguete, materiales, beneficios, recomendaciones de uso, etc.'
                             )
                             ->rows(6)
                             ->maxLength(2000)
-                            ->columnSpanFull()
-                            ->helperText(
-                                'Incluye información que pueda ayudar a elegir o utilizar correctamente el juguete.'
-                            ),
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
 }
-

@@ -22,7 +22,8 @@ class FeedingPlanResource extends Resource
 {
     protected static ?string $model = FeedingPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCake;
+    protected static string|BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedCake;
 
     protected static ?string $recordTitleAttribute = 'food_type';
 
@@ -68,7 +69,7 @@ class FeedingPlanResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -81,7 +82,7 @@ class FeedingPlanResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -94,7 +95,7 @@ class FeedingPlanResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -109,7 +110,7 @@ class FeedingPlanResource extends Resource
             return $query->whereRaw('1 = 0');
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return $query;
         }
 

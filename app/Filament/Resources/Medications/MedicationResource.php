@@ -22,7 +22,8 @@ class MedicationResource extends Resource
 {
     protected static ?string $model = Medication::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
+    protected static string|BackedEnum|null $navigationIcon =
+        Heroicon::OutlinedBeaker;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -68,7 +69,7 @@ class MedicationResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -81,7 +82,7 @@ class MedicationResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -94,7 +95,7 @@ class MedicationResource extends Resource
             return false;
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
@@ -109,7 +110,7 @@ class MedicationResource extends Resource
             return $query->whereRaw('1 = 0');
         }
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin'])) {
             return $query;
         }
 
@@ -121,6 +122,7 @@ class MedicationResource extends Resource
         return [
             'name',
             'description',
+            'pet.name',
         ];
     }
 
@@ -132,6 +134,7 @@ class MedicationResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
+            'Mascota' => $record->pet?->name ?? 'Sin mascota',
             'Medicamento' => $record->name,
         ];
     }

@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Activity extends Model
 {
     use HasFactory;
 
-    // Opcional
     protected $table = 'activities';
 
     protected $fillable = [
@@ -18,12 +18,12 @@ class Activity extends Model
         'description',
         'pet_id',
     ];
-    protected $casts = [
-    'date_time' => 'datetime',
-];
 
-    // 🔗 Relación: pertenece a una mascota
-    public function pet()
+    protected $casts = [
+        'date_time' => 'datetime',
+    ];
+
+    public function pet(): BelongsTo
     {
         return $this->belongsTo(Pet::class);
     }
